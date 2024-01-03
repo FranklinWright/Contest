@@ -1,0 +1,48 @@
+﻿@page "/accounttypelisting"
+
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
+
+<PageTitle>Account Types</PageTitle>
+<nav>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="adminmenu">Admin Menu</a></li>
+        <li class="breadcrumb-item active">Account Type Listing</li>
+    </ol>
+</nav>
+
+<h3>Account Type Listing</h3>
+
+@if (accountTypes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @if (accountTypes.Count == 0)
+    {
+        <p><em>No account types found.</em></p>
+    }
+    else
+    {
+        <p><em>Found @accountTypes.Count account types.</em></p>
+
+        <ul>
+            @foreach (var accountType in accountTypes)
+            {
+                <li>@accountType.AccountTypeName (@accountType.AccountTypeId)</li>
+            }
+        </ul>
+    }
+}
+
+@code {
+    private List<AccountType>? accountTypes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var service = new AccountTypesService(navManager);
+        accountTypes = await service.GetAccountTypesAsync();
+    }
+}

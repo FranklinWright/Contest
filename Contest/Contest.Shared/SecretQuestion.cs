@@ -1,8 +1,11 @@
-﻿namespace Contest.Shared
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Contest.Shared
 {
     public class SecretQuestion
     {
         public int SecretQuestionId { get; set; }
-        public required string Question { get; set; }
+        [Required]
+        public string? Question { get; set; }
     }
 }
