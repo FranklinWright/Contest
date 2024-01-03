@@ -29,33 +29,23 @@ namespace Contest.Client.Services
             return secretQuestion;
         }
 
-        public async Task<SecretQuestion?> CreateSecretQuestionAsync(SecretQuestion secretQuestion)
+        public async Task<bool> CreateSecretQuestionAsync(SecretQuestion secretQuestion)
         {
             var response = await _httpClient.PostAsJsonAsync("api/SecretQuestions", secretQuestion);
-            if (response.IsSuccessStatusCode)
-            {
-                var newSecretQuestion = await response.Content.ReadFromJsonAsync<SecretQuestion>();
-                return newSecretQuestion;
-            }
-            else
-            {
-                return null;
-            }
+            return response.IsSuccessStatusCode;
         }
 
-        public async Task<SecretQuestion?> UpdateSecretQuestionAsync(SecretQuestion secretQuestion)
+        public async Task<bool> UpdateSecretQuestionAsync(SecretQuestion secretQuestion)
         {
             string endpoint = $"api/SecretQuestions/{secretQuestion.SecretQuestionId}";
             var response = await _httpClient.PutAsJsonAsync(endpoint, secretQuestion);
-            if (response.IsSuccessStatusCode)
-            {
-                var updatedSecretQuestion = await response.Content.ReadFromJsonAsync<SecretQuestion>();
-                return updatedSecretQuestion;
-            }
-            else
-            {
-                return null;
-            }
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task DeleteSecretQuestionAsync(int secretQuestionId)
+        {
+            string endpoint = $"api/SecretQuestions/{secretQuestionId}";
+            await _httpClient.DeleteAsync(endpoint);
         }
     }
 }
