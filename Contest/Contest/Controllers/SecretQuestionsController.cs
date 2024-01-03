@@ -12,7 +12,7 @@ namespace Contest.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SecretQuestionsController : MyController
+    public class SecretQuestionsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
