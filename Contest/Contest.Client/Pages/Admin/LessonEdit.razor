@@ -1,0 +1,154 @@
+﻿@page "/lessonedit/{tutorialID:int}/{lessonId:int}"
+
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
+
+<PageTitle>Account Types</PageTitle>
+@if (lesson != null)
+{
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="adminmenu">Admin Menu</a></li>
+            <li class="breadcrumb-item"><a href="tutoriallisting">Tutorial Listing</a></li>
+            <li class="breadcrumb-item"><a href="tutorialedit/@tutorialId">Edit</a></li>
+            <li class="breadcrumb-item active">Lesson Edit</li>
+        </ol>
+    </nav>
+}
+<h3>Lesson Edit</h3>
+
+@if (lesson == null || tutorial == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="main">
+        <EditForm Model="lesson" OnValidSubmit="OnValidSubmit">
+            <div>Id: @lesson.LessonId</div>
+            <div>Tutorial Name: @tutorial.Title</div>
+            <div class="form-group">
+                <label>Lesson's Name</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="lesson.Title" />
+                    <ValidationMessage For="@(() => lesson.Title)" />
+                </div>
+                <label>Lesson's order</label>
+                <div>
+                    <InputNumber class="form-control" @bind-Value="lesson.Order" />
+                    <ValidationMessage For="@(() => lesson.Order)" />
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label">Lesson</label>
+                    <textarea class="form-control" @bind="lesson.Body" rows="8"></textarea>
+                    <ValidationMessage For="@(() => lesson.Body)" />
+                </div>
+            </div>
+
+            <DataAnnotationsValidator />
+
+            <br />
+            <button type="submit" class="btn btn-primary mr-auto">Save</button>
+            <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel">Cancel</button>
+            @if (lesson.LessonId > 0)
+            {
+                <span> | </span>
+                <button type="button" class="btn btn-danger mr-auto" @onclick="Delete">Delete</button>
+            }
+        </EditForm>
+    </div>
+
+    <br />
+    @if (ShowErrorMsg)
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error!</h4>
+            <p>@ErrorMessages["Message"]</p>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public int lessonId { get; set; }
+    [Parameter] public int tutorialId { get; set; }
+    private Lesson? lesson = new Lesson();
+    private Tutorial? tutorial = new Tutorial();
+    protected bool ShowErrorMsg = false;
+    protected Dictionary<string, string> ErrorMessages = new Dictionary<string, string>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (lessonId > 0)
+        {
+            var service = new LessonService(navManager);
+            var service2 = new TutorialService(navManager);
+
+            try
+            {
+                lesson = await service.GetLessonAsync(lessonId);
+                tutorial = await service2.GetTutorialAsync(tutorialId);
+            }
+            catch (Exception ex)
+            {
+                ErrorMessages["Message"] = ex.Message;
+                ShowErrorMsg = true;
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var service = new TutorialService(navManager);
+        tutorial = await service.GetTutorialAsync(tutorialId);
+    }
+
+
+    protected async Task OnValidSubmit()
+    {
+        var service = new LessonService(navManager);
+        if (lesson!.LessonId == 0)
+        {
+            lesson.TutorialId = tutorialId;
+            var success = await service.CreateLessonAsync(lesson!);
+            if (!success)
+            {
+                ErrorMessages["Message"] = "Error creating lesson.";
+                ShowErrorMsg = true;
+            }
+            else
+            {
+                navManager.NavigateTo("tutorialedit/" + lesson.TutorialId);
+            }
+        }
+        else
+        {
+            var success = await service.UpdateLessonAsync(lesson!);
+            if (!success)
+            {
+                ErrorMessages["Message"] = "Error updating Lesson.";
+                ShowErrorMsg = true;
+            }
+            else
+            {
+                navManager.NavigateTo("tutorialedit/" + lesson.TutorialId);
+            }
+        }
+    }
+
+    private void EditCancel()
+    {
+        if (lesson != null)
+        {
+            navManager.NavigateTo("tutorialedit/" + lesson.TutorialId);
+        }
+    }
+
+    private async void Delete()
+    {
+        var service = new LessonService(navManager);
+        await service.DeleteLessonAsync(lesson!.LessonId);
+        navManager.NavigateTo("tutorialedit/" + lesson.TutorialId);
+    }
+
+}

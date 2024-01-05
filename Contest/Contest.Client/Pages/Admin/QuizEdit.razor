@@ -1,0 +1,182 @@
+﻿@page "/quizedit/{tutorialID:int}/{quizId:int}"
+
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
+
+<PageTitle>Account Types</PageTitle>
+@if (quiz != null)
+{
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="adminmenu">Admin Menu</a></li>
+            <li class="breadcrumb-item"><a href="tutoriallisting">Tutorial Listing</a></li>
+            <li class="breadcrumb-item"><a href="tutorialedit/@tutorialId">Edit</a></li>
+            <li class="breadcrumb-item active">Quiz Edit</li>
+        </ol>
+    </nav>
+}
+<h3>Quiz Edit</h3>
+
+@if (quiz == null || tutorial == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="main">
+        <EditForm Model="quiz" OnValidSubmit="OnValidSubmit">
+            <div>Id: @quiz.QuizId</div>
+            <div>Tutorial Name: @tutorial.Title</div>
+            <div class="form-group">
+                <label>Question</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="quiz.Question" />
+                    <ValidationMessage For="@(() => quiz.Question)" />
+                </div>
+                <label>Question Topic</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="quiz.Topic" />
+                    <ValidationMessage For="@(() => quiz.Topic)" />
+                </div>
+                <label>Question Order</label>
+                <div>
+                    <InputNumber class="form-control" @bind-Value="quiz.Order" />
+                    <ValidationMessage For="@(() => quiz.Order)" />
+                </div>
+                <label>Answer Choices</label>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">A</span>
+                    <InputText class="form-control" @bind-Value="quiz.A" />
+                    <ValidationMessage For="@(() => quiz.A)" />
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">B</span>
+                    <InputText class="form-control" @bind-Value="quiz.B" />
+                    <ValidationMessage For="@(() => quiz.B)" />
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">C</span>
+                    <InputText class="form-control" @bind-Value="quiz.C" />
+                    <ValidationMessage For="@(() => quiz.C)" />
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">D</span>
+                    <InputText class="form-control" @bind-Value="quiz.D" />
+                    <ValidationMessage For="@(() => quiz.D)" />
+                </div>
+                <label>Correct Answer</label>
+                <select class="form-select" @bind="@quiz.Answer" aria-label="Default select example">
+                    <option selected>A</option>
+                    <option value="1">B</option>
+                    <option value="2">C</option>
+                    <option value="3">D</option>
+                </select>
+            </div>
+
+            <DataAnnotationsValidator />
+
+            <br />
+            <button type="submit" class="btn btn-primary mr-auto">Save</button>
+            <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel">Cancel</button>
+            @if (quiz.QuizId > 0)
+            {
+                <span> | </span>
+                <button type="button" class="btn btn-danger mr-auto" @onclick="Delete">Delete</button>
+            }
+        </EditForm>
+    </div>
+
+    <br />
+    @if (ShowErrorMsg)
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error!</h4>
+            <p>@ErrorMessages["Message"]</p>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public int quizId { get; set; }
+    [Parameter] public int tutorialId { get; set; }
+    private Quiz? quiz = new Quiz();
+    private Tutorial? tutorial = new Tutorial();
+    protected bool ShowErrorMsg = false;
+    protected Dictionary<string, string> ErrorMessages = new Dictionary<string, string>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (quizId > 0)
+        {
+            var service = new QuizService(navManager);
+            var service2 = new TutorialService(navManager);
+
+            try
+            {
+                quiz = await service.GetQuizAsync(quizId);
+                tutorial = await service2.GetTutorialAsync(tutorialId);
+            }
+            catch (Exception ex)
+            {
+                ErrorMessages["Message"] = ex.Message;
+                ShowErrorMsg = true;
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var service = new TutorialService(navManager);
+        tutorial = await service.GetTutorialAsync(tutorialId);
+    }
+
+
+    protected async Task OnValidSubmit()
+    {
+        var service = new QuizService(navManager);
+        if (quiz!.QuizId == 0)
+        {
+            quiz.TutorialId = tutorialId;
+            var success = await service.CreateQuizAsync(quiz!);
+            if (!success)
+            {
+                ErrorMessages["Message"] = "Error creating quiz.";
+                ShowErrorMsg = true;
+            }
+            else
+            {
+                navManager.NavigateTo("tutorialedit/" + quiz.TutorialId);
+            }
+        }
+        else
+        {
+            var success = await service.UpdateQuizAsync(quiz!);
+            if (!success)
+            {
+                ErrorMessages["Message"] = "Error updating Quiz.";
+                ShowErrorMsg = true;
+            }
+            else
+            {
+                navManager.NavigateTo("tutorialedit/" + quiz.TutorialId);
+            }
+        }
+    }
+
+    private void EditCancel()
+    {
+        if (quiz != null)
+        {
+            navManager.NavigateTo("tutorialedit/" + tutorialId);
+        }
+    }
+
+    private async void Delete()
+    {
+        var service = new QuizService(navManager);
+        await service.DeleteQuizAsync(quiz!.QuizId);
+        navManager.NavigateTo("tutorialedit/" + quiz.TutorialId);
+    }
+
+}

@@ -1,0 +1,56 @@
+﻿@page "/tutoriallisting"
+
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
+
+<PageTitle>Account Types</PageTitle>
+<nav>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="adminmenu">Admin Menu</a></li>
+        <li class="breadcrumb-item active">Tutorial Listing</li>
+    </ol>
+</nav>
+
+<h3>
+    Tutorial Listing
+    <a href="tutorialedit\0"><button class="btn btn-sm btn-success">+</button></a>
+</h3>
+
+@if (tutorial == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @if (tutorial.Count == 0)
+    {
+        <p><em>No Tutorials found.</em></p>
+    }
+    else
+    {
+        <p><em>Found @tutorial.Count Tutorials.</em></p>
+
+        <ul>
+            @foreach (var tutorial in tutorial)
+            {
+                <div class="pb-2">
+                    <a class="btn btn-sm btn-primary" href="tutorialedit\@tutorial.TutorialId">Edit</a>
+                    <span class="b-2"> @tutorial.Title</span>
+                </div>
+            }
+        </ul>
+    }
+}
+
+@code {
+    private List<Tutorial>? tutorial;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var service = new TutorialService(navManager);
+        tutorial = await service.GetTutorialAsync();
+    }
+}
+
+

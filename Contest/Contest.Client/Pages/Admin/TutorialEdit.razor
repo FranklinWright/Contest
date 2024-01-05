@@ -1,0 +1,205 @@
+﻿@page "/tutorialedit/{tutorialId:int}"
+
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
+
+<PageTitle>Account Types</PageTitle>
+<nav>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="adminmenu">Admin Menu</a></li>
+        <li class="breadcrumb-item"><a href="tutoriallisting">Tutorial Listing</a></li>
+        <li class="breadcrumb-item active">Edit</li>
+    </ol>
+</nav>
+<h3>Tutorial Edit</h3>
+
+@if (tutorial == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="main">
+        <EditForm Model="tutorial" OnValidSubmit="OnValidSubmit">
+            <div>Id: @tutorial.TutorialId</div>
+            <div class="form-group">
+                <label>Tutorial Name</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="tutorial.Title" />
+                    <ValidationMessage For="@(() => tutorial.Title)" />
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="exampleFormControlTextarea1" class="form-label">Description</label>
+                <textarea class="form-control" @bind="tutorial.Description" rows="3"></textarea>
+                <ValidationMessage For="@(() => tutorial.Description)" />
+            </div>
+            <DataAnnotationsValidator />
+
+            @if (tutorial.TutorialId > 0)
+            {
+                <br />
+
+                <h3>@tutorial.Title's Lesson List
+                    <a href="lessonedit/@tutorial.TutorialId/0"><button class="btn btn-sm btn-success">+</button></a>
+                </h3>
+                @if (lesson == null || quiz == null)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else
+                {
+                    @if (lesson.Count == 0)
+                    {
+                        <p><em>No Lessons found.</em></p>
+                    }
+                    else
+                    {
+                        <p><em>Found @lesson.Count Lessons.</em></p>
+
+                        <ul>
+                            @foreach (var lesson in lesson)
+                            {
+                                <div class="pb-2">
+                                    <a class="btn btn-sm btn-primary" href="lessonedit/@tutorial.TutorialId/@lesson.LessonId">Edit</a>
+                                    <span class="b-2"> @lesson.Title</span>
+                                </div>
+                            }
+                        </ul>
+                    }
+                    <br />
+                    <h3>
+                        @tutorial.Title's Quiz Questions
+                        <a href="quizedit/@tutorial.TutorialId/0"><button class="btn btn-sm btn-success">+</button></a>
+                    </h3>
+                    <br />
+                    @if (quiz.Count == 0)
+                    {
+                        <p><em>No Questions found.</em></p>
+                    }
+                    else
+                    {
+                        <p><em>Quiz has @quiz.Count questions.</em></p>
+
+                        <ul>
+                            @foreach (var quiz in quiz)
+                            {
+                                <div class="pb-2">
+                                    <a class="btn btn-sm btn-primary" href="quizedit/@tutorial.TutorialId/@quiz.QuizId">Edit</a>
+                                    <span class="b-2"> @quiz.Topic</span>
+                                </div>
+                            }
+                        </ul>
+                    }
+                }
+            }
+            
+
+
+            <br />
+            <button type="submit" class="btn btn-primary mr-auto">Save</button>
+            <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel">Cancel</button>
+            @if (tutorial.TutorialId > 0)
+            {
+                <span> | </span>
+                <button type="button" class="btn btn-danger mr-auto" @onclick="Delete">Delete</button>
+            }
+        </EditForm>
+    </div>
+
+
+    <br />
+    @if (ShowErrorMsg)
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error!</h4>
+            <p>@ErrorMessages["Message"]</p>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public int tutorialId { get; set; }
+
+    private Tutorial? tutorial = new Tutorial();
+    protected bool ShowErrorMsg = false;
+    protected Dictionary<string, string> ErrorMessages = new Dictionary<string, string>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (tutorialId > 0)
+        {
+            var service = new TutorialService(navManager);
+
+            try
+            {
+                tutorial = await service.GetTutorialAsync(tutorialId);
+            }
+            catch (Exception ex)
+            {
+                ErrorMessages["Message"] = ex.Message;
+                ShowErrorMsg = true;
+            }
+        }
+    }
+
+    protected async Task OnValidSubmit()
+    {
+        var service = new TutorialService(navManager);
+        if (tutorial!.TutorialId == 0)
+        {
+            var success = await service.CreateTutorialAsync(tutorial!);
+            if (!success)
+            {
+                ErrorMessages["Message"] = "Error creating tutorial.";
+                ShowErrorMsg = true;
+            }
+            else
+            {
+                navManager.NavigateTo("tutoriallisting");
+            }
+        }
+        else
+        {
+            var success = await service.UpdateTutorialAsync(tutorial!);
+            if (!success)
+            {
+                ErrorMessages["Message"] = "Error updating tutorial.";
+                ShowErrorMsg = true;
+            }
+            else
+            {
+                navManager.NavigateTo("tutoriallisting");
+            }
+        }
+    }
+
+    private void EditCancel()
+    {
+        navManager.NavigateTo("tutoriallisting");
+    }
+
+    private async void Delete()
+    {
+        var service = new TutorialService(navManager);
+        await service.DeleteTutorialAsync(tutorial!.TutorialId);
+        navManager.NavigateTo("tutoriallisting");
+    }
+
+    private List<Lesson>? lesson;
+    private List<Quiz>? quiz;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var service = new LessonService(navManager);
+        lesson = await service.GetLessonAsyncInOrder(tutorialId);
+        var service2 = new QuizService(navManager);
+        quiz = await service2.GetQuizAsyncInOrder(tutorialId);
+    }
+
+
+
+   
+
+}
