@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using System.Data;
 using System.Security.Claims;
 
 namespace Contest.Client
@@ -26,10 +28,16 @@ namespace Contest.Client
                 return;
             }
 
+            var firstName = userInfo.FirstName;
+
             Claim[] claims = [
                 new Claim(ClaimTypes.NameIdentifier, userInfo.UserId),
                 new Claim(ClaimTypes.Name, userInfo.Email),
-                new Claim(ClaimTypes.Email, userInfo.Email)];
+                new Claim(ClaimTypes.Email, userInfo.Email),
+                new Claim(ClaimTypes.Role, userInfo.AccountType),
+                new Claim("FirstName", userInfo.FirstName),
+                new Claim("LastName", userInfo.LastName)
+                ];
 
             authenticationStateTask = Task.FromResult(
                 new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims,

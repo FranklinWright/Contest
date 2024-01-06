@@ -19,6 +19,7 @@ namespace Contest.Components.Account
         private readonly IServiceScopeFactory scopeFactory;
         private readonly PersistentComponentState state;
         private readonly IdentityOptions options;
+        private readonly UserManager<ApplicationUser> userManager;
 
         private readonly PersistingComponentStateSubscription subscription;
 
@@ -28,12 +29,14 @@ namespace Contest.Components.Account
             ILoggerFactory loggerFactory,
             IServiceScopeFactory serviceScopeFactory,
             PersistentComponentState persistentComponentState,
-            IOptions<IdentityOptions> optionsAccessor)
+            IOptions<IdentityOptions> optionsAccessor,
+            UserManager<ApplicationUser> userManager)
             : base(loggerFactory)
         {
             scopeFactory = serviceScopeFactory;
             state = persistentComponentState;
             options = optionsAccessor.Value;
+            this.userManager = userManager;
 
             AuthenticationStateChanged += OnAuthenticationStateChanged;
             subscription = state.RegisterOnPersisting(OnPersistingAsync, RenderMode.InteractiveWebAssembly);
@@ -86,8 +89,18 @@ namespace Contest.Components.Account
 
             if (principal.Identity?.IsAuthenticated == true)
             {
+                var user = await userManager.GetUserAsync(principal);
+
                 var userId = principal.FindFirst(options.ClaimsIdentity.UserIdClaimType)?.Value;
                 var email = principal.FindFirst(options.ClaimsIdentity.EmailClaimType)?.Value;
+                var firstName = user!.FirstName;
+                var lastName = user!.LastName;
+                var accountType = user!.AccountType;
+
+                if (firstName == null || lastName == null || accountType == null)
+                {
+                    throw new UnreachableException($"User data not set in {nameof(OnPersistingAsync)}().");
+                }
 
                 if (userId != null && email != null)
                 {
@@ -95,6 +108,9 @@ namespace Contest.Components.Account
                     {
                         UserId = userId,
                         Email = email,
+                        FirstName = firstName,
+                        LastName = lastName,
+                        AccountType = accountType,
                     });
                 }
             }
