@@ -1,0 +1,134 @@
+﻿@page "/classedit/{classId:int}"
+
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
+@using Microsoft.AspNetCore.Authorization
+
+<PageTitle>Account Types</PageTitle>
+<nav>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="classlisting">Classes</a></li>
+        <li class="breadcrumb-item active">Edit</li>
+    </ol>
+</nav>
+<h3>Class Edit </h3>
+
+
+
+@if (classes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="main">
+        <EditForm Model="classes" OnValidSubmit="OnValidSubmit">
+            <div>Id: @classes.ClassId</div>
+            <div class="form-group">
+                <label>Class Name</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="classes.ClassName" />
+                    <ValidationMessage For="@(() => classes.ClassName)" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Class Code</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="classes.ClassCode" />
+                    <ValidationMessage For="@(() => classes.ClassCode)" />
+                </div>
+            </div>
+
+            <DataAnnotationsValidator />
+
+            <br />
+            <button type="submit" class="btn btn-primary mr-auto">Save</button>
+            <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel">Cancel</button>
+            @if (classes.ClassId > 0)
+            {
+                <span> | </span>
+                <button type="button" class="btn btn-danger mr-auto" @onclick="Delete">Delete</button>
+            }
+        </EditForm>
+    </div>
+
+    <br />
+    @if (ShowErrorMsg)
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error!</h4>
+            <p>@ErrorMessages["Message"]</p>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public int classId { get; set; }
+
+    private Class? classes = new Class();
+    protected bool ShowErrorMsg = false;
+    protected Dictionary<string, string> ErrorMessages = new Dictionary<string, string>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (classId > 0)
+        {
+            var service = new ClassService(navManager);
+            try
+            {
+                classes = await service.GetClassAsync(classId);
+            }
+            catch (Exception ex)
+            {
+                ErrorMessages["Message"] = ex.Message;
+                ShowErrorMsg = true;
+            }
+        }
+    }
+
+    protected async Task OnValidSubmit()
+    {
+        var service = new ClassService(navManager);
+        if (classes!.ClassId == 0)
+        {
+           
+            var success = await service.CreateClassAsync(classes!);
+            if (!success)
+            {
+                ErrorMessages["Message"] = "Error creating secret classes.";
+                ShowErrorMsg = true;
+            }
+            else
+            {
+                navManager.NavigateTo("classlisting");
+            }
+        }
+        else
+        {
+            var success = await service.UpdateClassAsync(classes!);
+            if (!success)
+            {
+                ErrorMessages["Message"] = "Error updating secret classes.";
+                ShowErrorMsg = true;
+            }
+            else
+            {
+                navManager.NavigateTo("classlisting");
+            }
+        }
+    }
+
+    private void EditCancel()
+    {
+        navManager.NavigateTo("classlisting");
+    }
+
+    private async void Delete()
+    {
+        var service = new ClassService(navManager);
+        await service.DeleteClassAsync(classes!.ClassId);
+        navManager.NavigateTo("classlisting");
+    }
+}

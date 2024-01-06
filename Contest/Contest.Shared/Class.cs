@@ -9,6 +9,7 @@ namespace Contest.Shared
         public string? ClassName { get; set; }
         [Required]
         public string? ClassCode { get; set; }
-        public int UserId { get; set; }
+        [Required]
+        public Guid UserId { get; set; }
     }
 }

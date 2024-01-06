@@ -1,0 +1,55 @@
+﻿@page "/classlisting"
+
+
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
+
+<PageTitle>Classes</PageTitle>
+
+
+<h3>
+    Classes
+    
+    
+</h3>
+
+@if (classes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <AuthorizeView Roles="Teacher">
+        <h2>
+            Welcome @context.User.Identity?.Name
+            <a href="ClassEdit/0"><button class="btn btn-sm btn-success">+</button></a>
+        </h2>
+        @if (classes.Count == 0)
+        {
+            <p><em>No classes found.</em></p>
+        }
+        else
+        {
+            <p><em>You are in @classes.Count classes.</em></p>
+
+            @foreach (var classes in classes)
+            {
+                <div class="pb-2">
+                    <a class="btn btn-sm btn-primary" href="secretquestionedit\@classes.ClassId">Edit</a>
+                    <span class="b-2"> @classes.ClassName</span>
+                </div>
+            }
+        }
+    </AuthorizeView>
+}
+
+@code {
+    private List<Class>? classes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var service = new ClassService(navManager);
+        classes = await service.GetClassAsync();
+    }
+}
