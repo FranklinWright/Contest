@@ -14,7 +14,7 @@
 
 <h3>
     Tutorial Listing
-    <a href="tutorialedit\0"><button class="btn btn-sm btn-success">+</button></a>
+    <a href="tutorialedit\0"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
 </h3>
 
 @if (tutorial == null)
@@ -35,7 +35,7 @@ else
             @foreach (var tutorial in tutorial)
             {
                 <div class="pb-2">
-                    <a class="btn btn-sm btn-primary" href="tutorialedit\@tutorial.TutorialId">Edit</a>
+                    <a class="btn btn-sm btn-primary" href="tutorialedit\@tutorial.TutorialId"><i class="bi bi-pencil-fill"></i></a>
                     <span class="b-2"> @tutorial.Title</span>
                 </div>
             }

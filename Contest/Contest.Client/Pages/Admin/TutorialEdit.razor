@@ -42,7 +42,7 @@ else
                 <br />
 
                 <h3>@tutorial.Title's Lesson List
-                    <a href="lessonedit/@tutorial.TutorialId/0"><button class="btn btn-sm btn-success">+</button></a>
+                    <a href="lessonedit/@tutorial.TutorialId/0"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
                 </h3>
                 @if (lesson == null || quiz == null)
                 {
@@ -62,7 +62,7 @@ else
                             @foreach (var lesson in lesson)
                             {
                                 <div class="pb-2">
-                                    <a class="btn btn-sm btn-primary" href="lessonedit/@tutorial.TutorialId/@lesson.LessonId">Edit</a>
+                                    <a class="btn btn-sm btn-primary" href="lessonedit/@tutorial.TutorialId/@lesson.LessonId"><i class="bi bi-pencil-fill"></i></a>
                                     <span class="b-2"> @lesson.Title</span>
                                 </div>
                             }
@@ -71,7 +71,7 @@ else
                     <br />
                     <h3>
                         @tutorial.Title's Quiz Questions
-                        <a href="quizedit/@tutorial.TutorialId/0"><button class="btn btn-sm btn-success">+</button></a>
+                        <a href="quizedit/@tutorial.TutorialId/0"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
                     </h3>
                     <br />
                     @if (quiz.Count == 0)
@@ -86,7 +86,7 @@ else
                             @foreach (var quiz in quiz)
                             {
                                 <div class="pb-2">
-                                    <a class="btn btn-sm btn-primary" href="quizedit/@tutorial.TutorialId/@quiz.QuizId">Edit</a>
+                                    <a class="btn btn-sm btn-primary" href="quizedit/@tutorial.TutorialId/@quiz.QuizId"><i class="bi bi-pencil-fill"></i></a>
                                     <span class="b-2"> @quiz.Topic</span>
                                 </div>
                             }
@@ -98,12 +98,12 @@ else
 
 
             <br />
-            <button type="submit" class="btn btn-primary mr-auto">Save</button>
-            <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel">Cancel</button>
+            <button type="submit" class="btn btn-success mr-auto"><i class="bi bi-save"></i></button>
+            <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel"><i class="bi bi-x-square"></i></button>
             @if (tutorial.TutorialId > 0)
             {
                 <span> | </span>
-                <button type="button" class="btn btn-danger mr-auto" @onclick="Delete">Delete</button>
+                <button type="button" class="btn btn-danger mr-auto" @onclick="Delete"><i class="bi bi-trash-fill"></i></button>
             }
         </EditForm>
     </div>

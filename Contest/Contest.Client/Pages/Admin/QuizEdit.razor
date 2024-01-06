@@ -77,12 +77,12 @@ else
             <DataAnnotationsValidator />
 
             <br />
-            <button type="submit" class="btn btn-primary mr-auto">Save</button>
-            <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel">Cancel</button>
+            <button type="submit" class="btn btn-primary mr-auto"><i class="bi bi-save"></i></button>
+            <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel"><i class="bi bi-x-square"></i></button>
             @if (quiz.QuizId > 0)
             {
                 <span> | </span>
-                <button type="button" class="btn btn-danger mr-auto" @onclick="Delete">Delete</button>
+                <button type="button" class="btn btn-danger mr-auto" @onclick="Delete"><i class="bi bi-trash-fill"></i></button>
             }
         </EditForm>
     </div>
