@@ -1,4 +1,4 @@
-﻿@page "/classedit/{classId:int}"
+﻿@page "/teacher/class-edit/{classId:int}"
 
 @using Contest.Client.Services
 @rendermode InteractiveAuto
@@ -51,6 +51,19 @@ else
                 <button type="button" class="btn btn-danger mr-auto" @onclick="Delete">Delete</button>
             }
         </EditForm>
+
+        @if (tutorials == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+@*             <h3>
+                Tutorials
+                <a href="teacher/tutorial-edit/@tutorial.TutorialId/0"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
+            </h3> *@
+        }
+
     </div>
 
     <br />
@@ -67,6 +80,7 @@ else
     [Parameter] public int classId { get; set; }
 
     private Class? classes = new Class();
+    private List<ClassTutorialResponse>? tutorials;
     protected bool ShowErrorMsg = false;
     protected Dictionary<string, string> ErrorMessages = new Dictionary<string, string>();
 
@@ -74,10 +88,13 @@ else
     {
         if (classId > 0)
         {
-            var service = new ClassService(navManager);
             try
             {
+                var service = new ClassService(navManager);
                 classes = await service.GetClassAsync(classId);
+
+                var classTutorialService = new ClassTutorialService(navManager);
+                tutorials = await classTutorialService.GetClassTutorialsByClassIdAsync(classId);
             }
             catch (Exception ex)
             {
@@ -92,11 +109,11 @@ else
         var service = new ClassService(navManager);
         if (classes!.ClassId == 0)
         {
-           
+
             var success = await service.CreateClassAsync(classes!);
             if (!success)
             {
-                ErrorMessages["Message"] = "Error creating secret classes.";
+                ErrorMessages["Message"] = "Error creating new class.";
                 ShowErrorMsg = true;
             }
             else
@@ -109,7 +126,7 @@ else
             var success = await service.UpdateClassAsync(classes!);
             if (!success)
             {
-                ErrorMessages["Message"] = "Error updating secret classes.";
+                ErrorMessages["Message"] = "Error updating class.";
                 ShowErrorMsg = true;
             }
             else

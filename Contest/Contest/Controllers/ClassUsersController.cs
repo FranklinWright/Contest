@@ -77,10 +77,12 @@ namespace Contest.Controllers
             }
             else
             {
-                // return a list of ClassUserResponse
+                var currentUserId = GetUserId();
+
                 var query = from cu in _context.ClassUser
                             join c in _context.Class on cu.ClassId equals c.ClassId
                             join u in _context.Users on cu.UserId.ToString() equals u.Id
+                            where cu.UserId == currentUserId
                             select new ClassUserResponse
                             {
                                 ClassId = c.ClassId,

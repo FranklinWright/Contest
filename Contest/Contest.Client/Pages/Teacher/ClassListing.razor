@@ -9,7 +9,7 @@
 
 <h3>
     Class Listing
-    <a href="classedit\0"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
+    <a href="teacher\class-edit\0"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
 </h3>
 
 @if (classes == null)
@@ -30,7 +30,7 @@ else
             @foreach (var item in classes)
             {
                 <div class="pb-2">
-                    <a class="btn btn-sm btn-primary" href="classedit\@item.ClassId"><i class="bi bi-pencil-fill"></i></a>
+                    <a class="btn btn-sm btn-primary" href="teacher/class-edit\@item.ClassId"><i class="bi bi-pencil-fill"></i></a>
                     <span class="b-2"> @item.ClassName [@item.ClassCode]</span>
                 </div>
             }

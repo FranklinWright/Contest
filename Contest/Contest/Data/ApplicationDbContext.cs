@@ -14,5 +14,6 @@ namespace Contest.Data
         public DbSet<Contest.Shared.Lesson> Lesson { get; set; } = default!;
         public DbSet<Contest.Shared.Progress> Progress { get; set; } = default!;
         public DbSet<Contest.Shared.Quiz> Quiz { get; set; } = default!;
+        public DbSet<Contest.Shared.ClassTutorial> ClassTutorial { get; set; } = default!;
     }
 }
