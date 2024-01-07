@@ -12,7 +12,7 @@ namespace Contest.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClassesController : ControllerBase
+    public class ClassesController : MyController
     {
         private readonly ApplicationDbContext _context;
 
@@ -25,7 +25,8 @@ namespace Contest.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Class>>> GetClass()
         {
-            return await _context.Class.ToListAsync();
+            var userId = GetUserId();
+            return await _context.Class.Where(c => c.UserId == userId).ToListAsync();
         }
 
         // GET: api/Classes/5
@@ -50,6 +51,17 @@ namespace Contest.Controllers
             if (id != @class.ClassId)
             {
                 return BadRequest();
+            }
+
+            var userId = GetUserId();
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            else 
+            {
+                @class.UserId = (Guid)userId;
             }
 
             _context.Entry(@class).State = EntityState.Modified;
@@ -80,6 +92,17 @@ namespace Contest.Controllers
         {
             _context.Class.Add(@class);
             await _context.SaveChangesAsync();
+
+            var userId = GetUserId();
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            else
+            {
+                @class.UserId = (Guid)userId;
+            }
 
             return CreatedAtAction("GetClass", new { id = @class.ClassId }, @class);
         }

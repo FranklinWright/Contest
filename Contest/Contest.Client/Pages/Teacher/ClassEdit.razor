@@ -5,13 +5,14 @@
 @inject NavigationManager navManager
 @using Microsoft.AspNetCore.Authorization
 
-<PageTitle>Account Types</PageTitle>
-<nav>
+<PageTitle>Class Edit</PageTitle>
+<div class="alert alert-info">Teacher</div>
+@* <nav>
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="classlisting">Classes</a></li>
         <li class="breadcrumb-item active">Edit</li>
     </ol>
-</nav>
+</nav> *@
 <h3>Class Edit </h3>
 
 @if (classes == null)
@@ -100,7 +101,7 @@ else
             }
             else
             {
-                navManager.NavigateTo("teacher/home");
+                navManager.NavigateTo("classlisting");
             }
         }
         else
@@ -113,20 +114,20 @@ else
             }
             else
             {
-                navManager.NavigateTo("teacher/home");
+                navManager.NavigateTo("classlisting");
             }
         }
     }
 
     private void EditCancel()
     {
-        navManager.NavigateTo("teacher/home");
+        navManager.NavigateTo("classlisting");
     }
 
     private async void Delete()
     {
         var service = new ClassService(navManager);
         await service.DeleteClassAsync(classes!.ClassId);
-        navManager.NavigateTo("teacher/home");
+        navManager.NavigateTo("classlisting");
     }
 }
