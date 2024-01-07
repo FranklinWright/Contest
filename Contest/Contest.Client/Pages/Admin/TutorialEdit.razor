@@ -6,12 +6,12 @@
 
 <PageTitle>Account Types</PageTitle>
 <div class="alert alert-info">Admin</div>
-<nav>
+@* <nav>
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="tutoriallisting">Tutorial Listing</a></li>
         <li class="breadcrumb-item active">Edit</li>
     </ol>
-</nav>
+</nav> *@
 <h3>Tutorial Edit</h3>
 
 @if (tutorial == null)
@@ -36,68 +36,6 @@ else
                 <ValidationMessage For="@(() => tutorial.Description)" />
             </div>
             <DataAnnotationsValidator />
-
-            @if (tutorial.TutorialId > 0)
-            {
-                <br />
-
-                <h3>@tutorial.Title's Lesson List
-                    <a href="lessonedit/@tutorial.TutorialId/0"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
-                </h3>
-                @if (lesson == null || quiz == null)
-                {
-                    <p><em>Loading...</em></p>
-                }
-                else
-                {
-                    @if (lesson.Count == 0)
-                    {
-                        <p><em>No Lessons found.</em></p>
-                    }
-                    else
-                    {
-                        <p><em>Found @lesson.Count Lessons.</em></p>
-
-                        <ul>
-                            @foreach (var lesson in lesson)
-                            {
-                                <div class="pb-2">
-                                    <a class="btn btn-sm btn-primary" href="lessonedit/@tutorial.TutorialId/@lesson.LessonId"><i class="bi bi-pencil-fill"></i></a>
-                                    <span class="b-2"> @lesson.Title</span>
-                                </div>
-                            }
-                        </ul>
-                    }
-                    <br />
-                    <h3>
-                        @tutorial.Title's Quiz Questions
-                        <a href="quizedit/@tutorial.TutorialId/0"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
-                    </h3>
-                    <br />
-                    @if (quiz.Count == 0)
-                    {
-                        <p><em>No Questions found.</em></p>
-                    }
-                    else
-                    {
-                        <p><em>Quiz has @quiz.Count questions.</em></p>
-
-                        <ul>
-                            @foreach (var quiz in quiz)
-                            {
-                                <div class="pb-2">
-                                    <a class="btn btn-sm btn-primary" href="quizedit/@tutorial.TutorialId/@quiz.QuizId"><i class="bi bi-pencil-fill"></i></a>
-                                    <span class="b-2"> @quiz.Topic</span>
-                                </div>
-                            }
-                        </ul>
-                    }
-                }
-            }
-            
-
-
-            <br />
             <button type="submit" class="btn btn-success mr-auto"><i class="bi bi-save"></i></button>
             <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel"><i class="bi bi-x-square"></i></button>
             @if (tutorial.TutorialId > 0)
@@ -106,6 +44,64 @@ else
                 <button type="button" class="btn btn-danger mr-auto" @onclick="Delete"><i class="bi bi-trash-fill"></i></button>
             }
         </EditForm>
+
+        @if (tutorial.TutorialId > 0)
+        {
+           <hr />
+
+            <h3>
+                Lessons
+                <a href="lessonedit/@tutorial.TutorialId/0"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
+            </h3>
+            @if (lesson == null || quiz == null)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else
+            {
+                @if (lesson.Count == 0)
+                {
+                    <p><em>No Lessons found.</em></p>
+                }
+                else
+                {
+                    <p><em>Lessons Found: @lesson.Count </em></p>
+
+                    <ul>
+                        @foreach (var lesson in lesson)
+                        {
+                            <div class="pb-2">
+                                <a class="btn btn-sm btn-primary" href="lessonedit/@tutorial.TutorialId/@lesson.LessonId"><i class="bi bi-pencil-fill"></i></a>
+                                <span class="b-2"> @lesson.Title</span>
+                            </div>
+                        }
+                    </ul>
+                }
+                <hr />
+                <h3>
+                    Quiz Questions
+                    <a href="quizedit/@tutorial.TutorialId/0"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
+                </h3>
+                @if (quiz.Count == 0)
+                {
+                    <p><em>No Questions found.</em></p>
+                }
+                else
+                {
+                    <p><em>Questions Found:@quiz.Count</em></p>
+
+                    <ul>
+                        @foreach (var quiz in quiz)
+                        {
+                            <div class="pb-2">
+                                <a class="btn btn-sm btn-primary" href="quizedit/@tutorial.TutorialId/@quiz.QuizId"><i class="bi bi-pencil-fill"></i></a>
+                                <span class="b-2"> @quiz.Topic</span>
+                            </div>
+                        }
+                    </ul>
+                }
+            }
+        }
     </div>
 
 
@@ -200,6 +196,6 @@ else
 
 
 
-   
+
 
 }
