@@ -5,8 +5,78 @@
 @inject NavigationManager navManager
 
 <Header />
-<h3>Teacher Student Listing</h3>
-This is a list of students for the teacher.
-@code {
+<h3>Student Listing</h3>
+This is a list of students by class.
+<br />
 
+@if (classes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @if (classes.Count == 0)
+    {
+        <p><em>No Classes found.</em></p>
+    }
+    else
+    {
+        // make a dropdown list of classes
+        <select class="form-select" aria-label="Default select example" @onchange="SelectClass">
+            <option selected>Select a class</option>
+            @foreach (var item in classes)
+            {
+                <option value="@item.ClassId">@item.ClassName</option>
+            }
+        </select>
+    }
+}
+
+@if (ShowStudents){
+    <br />
+    <h3>Students</h3>
+    @if (students == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        @if (students.Count == 0)
+        {
+            <p><em>No Students found.</em></p>
+        }
+        else
+        {
+            <p><em>Students found: @students.Count</em></p>
+
+            <ul>
+                @foreach (var item in students)
+                {
+                    <div class="pb-2">
+                        <span class="b-2"> @item</span>
+                    </div>
+                }
+            </ul>
+        }
+    }
+}
+
+@code {
+    private List<Class>? classes;
+    private bool ShowStudents = false;
+    private List<string>? students;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var service = new ClassService(navManager);
+        classes = await service.GetClassAsync();
+    }
+
+    protected void SelectClass(ChangeEventArgs e)
+    {
+        ShowStudents = true;
+        students = new List<string>();
+        //var service = new ClassUsersService(navManager);
+        //classes = await service.GetClassUserAsync();
+    }
 }

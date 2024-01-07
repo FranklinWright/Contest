@@ -31,12 +31,14 @@ namespace Contest.Client.Services
 
         public async Task<bool> CreateClassAsync(Class Classes)
         {
+            Classes.ClassCode = Classes.ClassCode!.ToUpper();
             var response = await _httpClient.PostAsJsonAsync("api/Classes", Classes);
             return response.IsSuccessStatusCode;
         }
 
         public async Task<bool> UpdateClassAsync(Class Classes)
         {
+            Classes.ClassCode = Classes.ClassCode!.ToUpper();
             string endpoint = $"api/Classes/{Classes.ClassId}";
             var response = await _httpClient.PutAsJsonAsync(endpoint, Classes);
             return response.IsSuccessStatusCode;
