@@ -1,7 +1,11 @@
 ﻿@page "/admin/home"
 
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
+
 <PageTitle>Home - Admin</PageTitle>
-<div class="alert alert-info">Admin</div>
+<Header />
 This is the admin home page.
 
 @code {
