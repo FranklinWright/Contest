@@ -4,13 +4,14 @@
 @rendermode InteractiveAuto
 @inject NavigationManager navManager
 
-<PageTitle>Account Types</PageTitle>
-<nav>
+<PageTitle>Tutorials</PageTitle>
+<div class="alert alert-info">Admin</div>
+@* <nav>
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="adminmenu">Admin Menu</a></li>
         <li class="breadcrumb-item active">Tutorial Listing</li>
     </ol>
-</nav>
+</nav> *@
 
 <h3>
     Tutorial Listing
@@ -23,6 +24,10 @@
 }
 else
 {
+    <div class="mb-1 mt-2">
+        <input type="text" @bind="SearchString" placeholder="Search" /> <button class="btn btn-sm btn-primary" @onclick="Search"><i class="bi bi-search"></i></button>
+    </div>
+
     @if (tutorial.Count == 0)
     {
         <p><em>No Tutorials found.</em></p>
@@ -45,11 +50,22 @@ else
 
 @code {
     private List<Tutorial>? tutorial;
+    private string? SearchString { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var service = new TutorialService(navManager);
         tutorial = await service.GetTutorialAsync();
+    }
+
+    protected async Task Search()
+    {
+        var service = new TutorialService(navManager);
+        tutorial = await service.GetTutorialAsync();
+        if (!string.IsNullOrEmpty(SearchString))
+        {
+            tutorial = tutorial!.Where(s => s.Tags.Contains(SearchString)).ToList();
+        }
     }
 }
 
