@@ -25,7 +25,7 @@ namespace Contest.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Tutorial>>> GetTutorial()
         {
-            return await _context.Tutorial.ToListAsync();
+            return await _context.Tutorial.OrderBy(t => t.Title).ToListAsync();
         }
 
         // GET: api/Tutorials/5

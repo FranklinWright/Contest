@@ -1,6 +1,10 @@
-﻿@implements IDisposable
+﻿@using Contest.Data
+@using Microsoft.AspNetCore.Identity
+@implements IDisposable
 
 @inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> UserManager
+@inject IHttpContextAccessor HttpContextAccessor
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -12,40 +16,50 @@
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="adminmenu">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Admin Menu
-            </NavLink>
-        </div>
-
-
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="classlisting">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Class
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="auth">
-                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
-            </NavLink>
-        </div>
-
         <AuthorizeView>
             <Authorized>
+                @if (accountType == "Student")
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="student/home" Match="NavLinkMatch.All">
+                            <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                        </NavLink>
+                    </div>
+                }
+
+                @if (accountType == "Teacher")
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="teacher/home" Match="NavLinkMatch.All">
+                            <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                        </NavLink>
+                    </div>
+                }
+
+                @if (accountType == "Admin")
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="admin/home" Match="NavLinkMatch.All">
+                            <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                        </NavLink>
+                    </div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="secretquestionlisting">
+                            <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Secret Questions
+                        </NavLink>
+                    </div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="tutoriallisting">
+                            <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Tutorials
+                        </NavLink>
+                    </div>
+                }
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="weather">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+                    </NavLink>
+                </div>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Manage">
                         <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
@@ -63,6 +77,11 @@
             </Authorized>
             <NotAuthorized>
                 <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Register">
                         <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
                     </NavLink>
@@ -79,9 +98,23 @@
 
 @code {
     private string? currentUrl;
+    private string? accountType;
 
-    protected override void OnInitialized()
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
+        if (authenticationState != null)
+        {
+            var authState = await authenticationState;
+
+            if (authState.User.Identity!.IsAuthenticated)
+            {
+                var user = await UserManager.FindByNameAsync(authState.User.Identity.Name);
+                accountType = user.AccountType;
+            };
+        }
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
     }
