@@ -1,7 +1,7 @@
 ﻿<AuthorizeView Roles="Student">
     <div class="alert alert-primary" role="alert">
         <i class="bi bi-backpack"></i>
-        Teacher:
+        Student:
         @context.User.Claims.FirstOrDefault(c => c.Type == "FirstName")?.Value
         @context.User.Claims.FirstOrDefault(c => c.Type == "LastName")?.Value
     </div>
@@ -17,7 +17,7 @@
 <AuthorizeView Roles="Admin">
     <div class="alert alert-danger" role="alert">
         <i class="bi bi-person-workspace"></i>
-        Teacher:
+        Admin:
         @context.User.Claims.FirstOrDefault(c => c.Type == "FirstName")?.Value
         @context.User.Claims.FirstOrDefault(c => c.Type == "LastName")?.Value
     </div>
