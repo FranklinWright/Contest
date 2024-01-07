@@ -21,33 +21,45 @@ namespace Contest.Controllers
 
         // GET: api/ClassUsers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ClassUserResponse>>> GetClassUser(
+        public async Task<ActionResult<List<ClassUserResponse>>> GetClassUser(
             [FromQuery] int classId,
             [FromQuery] Guid userId
             )
         {
             if (classId != 0)
             {
-                var query = from cu in _context.ClassUser
-                            join c in _context.Class on cu.ClassId equals c.ClassId
-                            join u in _context.Users on cu.UserId.ToString() equals u.Id
-                            where cu.ClassId == classId
-                            select new ClassUserResponse
-                            {
-                                ClassId = c.ClassId,
-                                ClassName = c.ClassName!,
-                                Students = new List<Student>
-                                {
-                                    new Student
-                                    {
-                                        UserId = Guid.Parse(u.Id),
-                                        FirstName = u.FirstName,
-                                        LastName = u.LastName
-                                    }
-                                }
-                            };
+                var result = new List<ClassUserResponse>();
+                var classUserResponse = new ClassUserResponse();
 
-                return Ok(query);
+                var selectedClass = await _context.Class.FindAsync(classId);
+                if (selectedClass == null)
+                {
+                    return NotFound();
+                };
+
+                classUserResponse.ClassId = selectedClass.ClassId;
+                classUserResponse.ClassName = selectedClass.ClassName!;
+                classUserResponse.Students = new List<Student>();
+
+                var selectedClassUsers = await _context.ClassUser.Where(cu => cu.ClassId == classId).ToListAsync();
+                foreach (var classUser in selectedClassUsers)
+                {
+                    var user = await _context.Users.FindAsync(classUser.UserId.ToString());
+                    if (user == null)
+                    {
+                        return NotFound();
+                    };
+
+                    classUserResponse.Students.Add(new Student
+                    {
+                        UserId = Guid.Parse(user.Id),
+                        FirstName = user.FirstName,
+                        LastName = user.LastName
+                    });
+                }
+
+                result.Add(classUserResponse);
+                return Ok(result);
             }
             else if (userId != Guid.Empty)
             {
@@ -61,29 +73,20 @@ namespace Contest.Controllers
                                 ClassName = c.ClassName!
                             };
 
-                return Ok(query);
+                return Ok(await query.ToListAsync());
             }
             else
             {
+                // return a list of ClassUserResponse
                 var query = from cu in _context.ClassUser
                             join c in _context.Class on cu.ClassId equals c.ClassId
                             join u in _context.Users on cu.UserId.ToString() equals u.Id
                             select new ClassUserResponse
                             {
                                 ClassId = c.ClassId,
-                                ClassName = c.ClassName!,
-                                Students = new List<Student>
-                                {
-                                    new Student
-                                    {
-                                        UserId = Guid.Parse(u.Id),
-                                        FirstName = u.FirstName,
-                                        LastName = u.LastName
-                                    }
-                                }
+                                ClassName = c.ClassName!
                             };
-
-                return Ok(query);
+                return Ok(await query.ToListAsync());
             }
         }
 
