@@ -12,7 +12,7 @@ namespace Contest.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClassUsersController : ControllerBase
+    public class ClassUsersController : MyController
     {
         private readonly ApplicationDbContext _context;
 
@@ -25,7 +25,8 @@ namespace Contest.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ClassUser>>> GetClassUser()
         {
-            return await _context.ClassUser.ToListAsync();
+            var userId = GetUserId();
+            return await _context.ClassUser.Where(cu => cu.UserId == userId).ToListAsync();
         }
 
         // GET: api/ClassUsers/5

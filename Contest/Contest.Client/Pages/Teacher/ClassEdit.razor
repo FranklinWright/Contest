@@ -14,8 +14,6 @@
 </nav>
 <h3>Class Edit </h3>
 
-
-
 @if (classes == null)
 {
     <p><em>Loading...</em></p>
@@ -102,7 +100,7 @@ else
             }
             else
             {
-                navManager.NavigateTo("classlisting");
+                navManager.NavigateTo("teacher/home");
             }
         }
         else
@@ -115,20 +113,20 @@ else
             }
             else
             {
-                navManager.NavigateTo("classlisting");
+                navManager.NavigateTo("teacher/home");
             }
         }
     }
 
     private void EditCancel()
     {
-        navManager.NavigateTo("classlisting");
+        navManager.NavigateTo("teacher/home");
     }
 
     private async void Delete()
     {
         var service = new ClassService(navManager);
         await service.DeleteClassAsync(classes!.ClassId);
-        navManager.NavigateTo("classlisting");
+        navManager.NavigateTo("teacher/home");
     }
 }
