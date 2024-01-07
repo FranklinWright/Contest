@@ -65,7 +65,6 @@ namespace Contest.Controllers
             {
                 var query = from cu in _context.ClassUser
                             join c in _context.Class on cu.ClassId equals c.ClassId
-                            join u in _context.Users on cu.UserId.ToString() equals u.Id
                             where cu.UserId == userId
                             select new ClassUserResponse
                             {
