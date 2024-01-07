@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Contest.Data;
 using Contest.Shared;
 
+
 namespace Contest.Controllers
 {
     [Route("api/[controller]")]
@@ -79,6 +80,17 @@ namespace Contest.Controllers
         [HttpPost]
         public async Task<ActionResult<ClassUser>> PostClassUser(ClassUser classUser)
         {
+            var userId = GetUserId();
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            else
+            {
+                @classUser.UserId = (Guid)userId;
+            }
+
             _context.ClassUser.Add(classUser);
             await _context.SaveChangesAsync();
 

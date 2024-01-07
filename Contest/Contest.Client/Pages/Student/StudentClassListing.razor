@@ -1,7 +1,50 @@
 ﻿@page "/student/classlisting"
 
-<h3>Student Class Listing</h3>
-<div class="alert alert-info">Student</div>
-@code {
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
 
+
+<PageTitle>Class Listing</PageTitle>
+<div class="alert alert-info">Student</div>
+
+<h3>
+    Class Listing
+    <a href="classadd"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
+</h3>
+
+@if (classes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @if (classes.Count == 0)
+    {
+        <p><em>No Classes found.</em></p>
+    }
+    else
+    {
+        <p><em>You have @classes.Count classes.</em></p>
+
+        <ul>
+            @foreach (var item in classes)
+            {
+                <div class="pb-2">
+                    <a class="btn btn-sm btn-primary" href="classedit\@item.ClassId"><i class="bi bi-pencil-fill"></i></a>
+                    <span class="b-2"> @item.ClassName [@item.ClassCode]</span>
+                </div>
+            }
+        </ul>
+    }
+}
+
+@code {
+    private List<Class>? classes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var service = new ClassService(navManager);
+        classes = await service.GetClassAsync();
+    }
 }

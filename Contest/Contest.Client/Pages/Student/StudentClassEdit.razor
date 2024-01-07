@@ -1,0 +1,146 @@
+﻿@page "/classadd"
+
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
+@using Microsoft.AspNetCore.Authorization
+
+<PageTitle>Class Edit</PageTitle>
+<div class="alert alert-info">Student</div>
+@* <nav>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="classlisting">Classes</a></li>
+        <li class="breadcrumb-item active">Edit</li>
+    </ol>
+</nav> *@
+<h3>Class Edit </h3>
+
+@if (classUser == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="main">
+        <EditForm Model="classUser" OnValidSubmit="OnValidSubmit">
+            <div class="form-group">
+                <label>Class Code</label>
+                <div>
+                    <InputText class="form-control" @bind-Value="classCode" />
+                    <ValidationMessage For="@(() => classCode)" />
+                </div>
+            </div>
+
+
+            <DataAnnotationsValidator />
+
+            <br />
+            <button type="submit" class="btn btn-primary mr-auto" @onclick="CheckCode">Save</button>
+            <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel">Cancel</button>
+
+        </EditForm>
+    </div>
+
+    <br />
+    @if (ShowErrorMsg)
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Error!</h4>
+            <p>@ErrorMessages["Message"]</p>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public int classUserId { get; set; }
+
+    private string? classCode;
+    private ClassUser? classUser = new ClassUser();
+    protected bool ShowErrorMsg = false;
+    protected Dictionary<string, string> ErrorMessages = new Dictionary<string, string>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        classCode = "";
+    }
+
+    protected async Task OnValidSubmit()
+    {
+        var service = new ClassUserService(navManager);
+        var service2 = new ClassService(navManager);
+        var classes = await service2.GetClassAsync();
+        bool vaild = false;
+        if(classes != null)
+        {
+            foreach (var clas in classes)
+            {
+                if(clas.ClassCode.Equals(classCode))
+                {
+                    vaild = true;
+                    break;
+                }
+            }
+        }
+        if (vaild)
+        {
+
+            var success = await service.CreateClassUserAsync(classUser!);
+            if (!success)
+            {
+                ErrorMessages["Message"] = "Error creating secret classUser.";
+                ShowErrorMsg = true;
+            }
+            else
+            {
+                navManager.NavigateTo("student/classlisting");
+            }
+        }
+
+    }
+
+    private async void CheckCode()
+    {
+        var service = new ClassUserService(navManager);
+        var service2 = new ClassService(navManager);
+        var classes = await service2.GetClassAsync();
+        bool vaild = false;
+        if (classes != null)
+        {
+            foreach (var clas in classes)
+            {
+                if (clas.ClassCode.Equals(classCode))
+                {
+                    vaild = true;
+                    classUser.ClassId = clas.ClassId;
+                    break;
+                }
+            }
+        }
+        if (vaild)
+        {
+
+            var success = await service.CreateClassUserAsync(classUser!);
+            if (!success)
+            {
+                ErrorMessages["Message"] = "Error creating secret classUser.";
+                ShowErrorMsg = true;
+            }
+            else
+            {
+                navManager.NavigateTo("student/classlisting");
+            }
+        }
+    }
+
+    private void EditCancel()
+    {
+        navManager.NavigateTo("student/classlisting");
+    }
+
+    private async void Delete()
+    {
+        var service = new ClassService(navManager);
+        await service.DeleteClassAsync(classUser!.ClassId);
+        navManager.NavigateTo("/student/classlisting");
+    }
+}
