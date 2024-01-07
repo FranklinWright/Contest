@@ -1,19 +1,24 @@
-﻿<AuthorizeView>
-     <div class="alert alert-info">
-    @if (context.User.IsInRole("Admin"))
-    {
-            <span>Admin: </span>  
-    }
-    else if (context.User.IsInRole("Teacher"))
-    {
-            <span>Teacher: </span>
-        }
-    else if (context.User.IsInRole("Student"))
-    {
-            <span>Student: </span>
-        }
-
-    @context.User.Claims.FirstOrDefault(c => c.Type == "FirstName")?.Value
-    @context.User.Claims.FirstOrDefault(c => c.Type == "LastName")?.Value
+﻿<AuthorizeView Roles="Student">
+    <div class="alert alert-primary" role="alert">
+        <i class="bi bi-backpack"></i>
+        Teacher:
+        @context.User.Claims.FirstOrDefault(c => c.Type == "FirstName")?.Value
+        @context.User.Claims.FirstOrDefault(c => c.Type == "LastName")?.Value
+    </div>
+</AuthorizeView>
+<AuthorizeView Roles="Teacher">
+    <div class="alert alert-success" role="alert">
+        <i class="bi bi-apple"></i>
+        Teacher: 
+        @context.User.Claims.FirstOrDefault(c => c.Type == "FirstName")?.Value
+        @context.User.Claims.FirstOrDefault(c => c.Type == "LastName")?.Value
+    </div>
+</AuthorizeView>
+<AuthorizeView Roles="Admin">
+    <div class="alert alert-danger" role="alert">
+        <i class="bi bi-person-workspace"></i>
+        Teacher:
+        @context.User.Claims.FirstOrDefault(c => c.Type == "FirstName")?.Value
+        @context.User.Claims.FirstOrDefault(c => c.Type == "LastName")?.Value
     </div>
 </AuthorizeView>

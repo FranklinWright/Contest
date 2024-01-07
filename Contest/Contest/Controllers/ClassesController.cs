@@ -1,32 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Contest.Data;
+using Contest.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Contest.Data;
-using Contest.Shared;
 
 namespace Contest.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClassesController : MyController
+    public class ClassesController(ApplicationDbContext context) : MyController
     {
-        private readonly ApplicationDbContext _context;
-
-        public ClassesController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         // GET: api/Classes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Class>>> GetClass()
         {
-            var userId = GetUserId();
-            return await _context.Class.Where(c => c.UserId == userId).ToListAsync();
+            var role = GetAccountType(_context);
+
+            if (role == "Teacher")
+            {
+                var userId = GetUserId();
+                return await _context.Class.Where(c => c.UserId == userId).ToListAsync();
+            }
+            else
+            {
+                return await _context.Class.ToListAsync();
+            }
         }
 
         // GET: api/Classes/5
@@ -59,7 +58,7 @@ namespace Contest.Controllers
             {
                 return Unauthorized();
             }
-            else 
+            else
             {
                 @class.UserId = (Guid)userId;
             }
