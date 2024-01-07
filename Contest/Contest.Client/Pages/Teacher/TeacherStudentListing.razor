@@ -23,7 +23,7 @@ else
     {
         // make a dropdown list of classes
         <select class="form-select" aria-label="Default select example" @onchange="SelectClass">
-            <option selected>Select a class</option>
+            <option selected value="0">Select a class</option>
             @foreach (var item in classes)
             {
                 <option value="@item.ClassId">@item.ClassName</option>
@@ -72,11 +72,18 @@ else
         classes = await service.GetClassAsync();
     }
 
-    protected void SelectClass(ChangeEventArgs e)
+    protected async Task SelectClass(ChangeEventArgs e)
     {
-        ShowStudents = true;
+        if (e.Value.ToString() == "0")
+        {
+            ShowStudents = false;
+            return;
+        }
+
         students = new List<string>();
-        //var service = new ClassUsersService(navManager);
-        //classes = await service.GetClassUserAsync();
+        ShowStudents = true;
+        List<ClassUserResponse> result;
+        var service = new ClassUserService(navManager);
+        result = await service.GetClassUserByClassIdAsync(int.Parse(e.Value.ToString()));
     }
 }

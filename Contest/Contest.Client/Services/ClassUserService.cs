@@ -16,16 +16,27 @@ namespace Contest.Client.Services
             _httpClient.BaseAddress = new Uri(_navigationManager.BaseUri);
         }
 
-        public async Task<List<Class>?> GetClassUserAsync()
+        public async Task<List<ClassUserResponse>?> GetClassUserAsync()
         {
-            var classUser = await _httpClient.GetFromJsonAsync<List<Class>>("api/ClassUsers");
-            return classUser;
+            var result = await _httpClient.GetFromJsonAsync<List<ClassUserResponse>>("api/ClassUsers");
+            return result;
         }
 
-        public async Task<Class?> GetClassUserAsync(int classUserId)
+        public async Task<List<ClassUserResponse>?> GetClassUserByClassIdAsync(int classId)
+        {
+            var url = new UriBuilder(_navigationManager.BaseUri)
+            {
+                Path = "api/ClassUsers",
+                Query = $"classId={classId}"
+            }.ToString();
+            var result = await _httpClient.GetFromJsonAsync<List<ClassUserResponse>>(url);
+            return result;
+        }
+
+        public async Task<ClassUser?> GetClassUserAsync(int classUserId)
         {
             string endpoint = $"api/ClassUsers/{classUserId}";
-            var classUser = await _httpClient.GetFromJsonAsync<Class>(endpoint);
+            var classUser = await _httpClient.GetFromJsonAsync<ClassUser>(endpoint);
             return classUser;
         }
 

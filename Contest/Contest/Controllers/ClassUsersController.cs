@@ -7,27 +7,84 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Contest.Data;
 using Contest.Shared;
+using System.Security.Principal;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 
 namespace Contest.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClassUsersController : MyController
+    public class ClassUsersController(ApplicationDbContext context) : MyController
     {
-        private readonly ApplicationDbContext _context;
-
-        public ClassUsersController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         // GET: api/ClassUsers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ClassUser>>> GetClassUser()
+        public async Task<ActionResult<IEnumerable<ClassUserResponse>>> GetClassUser(
+            [FromQuery] int classId,
+            [FromQuery] Guid userId
+            )
         {
-            var userId = GetUserId();
-            return await _context.ClassUser.Where(cu => cu.UserId == userId).ToListAsync();
+            if (classId != 0)
+            {
+                var query = from cu in _context.ClassUser
+                            join c in _context.Class on cu.ClassId equals c.ClassId
+                            join u in _context.Users on cu.UserId.ToString() equals u.Id
+                            where cu.ClassId == classId
+                            select new ClassUserResponse
+                            {
+                                ClassId = c.ClassId,
+                                ClassName = c.ClassName!,
+                                Students = new List<Student>
+                                {
+                                    new Student
+                                    {
+                                        UserId = Guid.Parse(u.Id),
+                                        FirstName = u.FirstName,
+                                        LastName = u.LastName
+                                    }
+                                }
+                            };
+
+                return Ok(query);
+            }
+            else if (userId != Guid.Empty)
+            {
+                var query = from cu in _context.ClassUser
+                            join c in _context.Class on cu.ClassId equals c.ClassId
+                            join u in _context.Users on cu.UserId.ToString() equals u.Id
+                            where cu.UserId == userId
+                            select new ClassUserResponse
+                            {
+                                ClassId = c.ClassId,
+                                ClassName = c.ClassName!
+                            };
+
+                return Ok(query);
+            }
+            else
+            {
+                var query = from cu in _context.ClassUser
+                            join c in _context.Class on cu.ClassId equals c.ClassId
+                            join u in _context.Users on cu.UserId.ToString() equals u.Id
+                            select new ClassUserResponse
+                            {
+                                ClassId = c.ClassId,
+                                ClassName = c.ClassName!,
+                                Students = new List<Student>
+                                {
+                                    new Student
+                                    {
+                                        UserId = Guid.Parse(u.Id),
+                                        FirstName = u.FirstName,
+                                        LastName = u.LastName
+                                    }
+                                }
+                            };
+
+                return Ok(query);
+            }
         }
 
         // GET: api/ClassUsers/5
