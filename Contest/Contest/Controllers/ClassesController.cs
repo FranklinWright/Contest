@@ -90,9 +90,6 @@ namespace Contest.Controllers
         [HttpPost]
         public async Task<ActionResult<Class>> PostClass(Class @class)
         {
-            _context.Class.Add(@class);
-            await _context.SaveChangesAsync();
-
             var userId = GetUserId();
 
             if (userId == null)
@@ -103,6 +100,9 @@ namespace Contest.Controllers
             {
                 @class.UserId = (Guid)userId;
             }
+
+            _context.Class.Add(@class);
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetClass", new { id = @class.ClassId }, @class);
         }
