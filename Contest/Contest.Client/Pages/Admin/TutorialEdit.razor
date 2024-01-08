@@ -4,13 +4,9 @@
 @rendermode InteractiveAuto
 @inject NavigationManager navManager
 
+<PageTitle>Tutorial Edit</PageTitle>
 <Header />
-@* <nav>
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="tutoriallisting">Tutorial Listing</a></li>
-        <li class="breadcrumb-item active">Edit</li>
-    </ol>
-</nav> *@
+
 <h3>Tutorial Edit</h3>
 
 @if (tutorial == null)
@@ -93,7 +89,7 @@ else
                         @foreach (var quiz in quiz)
                         {
                             <div class="pb-2">
-                                <a class="btn btn-sm btn-primary" href="quizedit/@tutorial.TutorialId/@quiz.QuizId"><i class="bi bi-pencil-fill"></i></a>
+                                <a class="btn btn-sm btn-primary" href="quizedit/@tutorial.TutorialId/@quiz.QuizId"><i class="bi bi-trash-fill"></i></a>
                                 <span class="b-2"> @quiz.Topic</span>
                             </div>
                         }

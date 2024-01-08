@@ -1,0 +1,95 @@
+﻿@page "/teacher/tutorial-add/{classId:int}"
+
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
+
+<PageTitle>Tutorials</PageTitle>
+<Header />
+
+<h3>
+    Tutorial Listing
+</h3>
+
+@if (tutorials == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="mb-1 mt-2">
+        <input type="text" @bind="SearchString" placeholder="Search" /> <button class="btn btn-sm btn-primary" @onclick="Search"><i class="bi bi-search"></i></button>
+    </div>
+
+    @if (tutorials.Count == 0)
+    {
+        <p><em>No Tutorials found.</em></p>
+    }
+    else
+    {
+        <p><em>Tutorials Found: @tutorials.Count</em></p>
+
+        <h4>Select the tutorials to add to the class.</h4>
+@*         @foreach (var tutorial in tutorials)
+        {
+            <div class="pb-2">
+                <div> <b>@tutorial.Title</b></div>
+                <div>@tutorial.Description</div>
+            </div>
+        } *@
+
+        <ul class="list-group">
+            @foreach (var tutorial in tutorials)
+            {
+            <li class="list-group-item">
+                <input class="form-check-input me-1" type="checkbox" id="@tutorial.TutorialId">
+                <label class="form-check-label" for="@tutorial.TutorialId">
+                    <b>@tutorial.Title</b>
+                    <div>@tutorial.Description</div>
+                </label>
+            </li>
+            }
+        </ul>
+        <br />
+        <button class="btn btn-primary" @onclick="SaveSelectedTutorials">Save</button>
+    }
+}
+
+@code {
+    private List<Tutorial>? tutorials;
+    private string? SearchString { get; set; }
+    private List<ClassTutorialResponse>? classTutorials;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var service = new TutorialService(navManager);
+        tutorials = await service.GetTutorialAsync();
+
+        var classTutorialService = new ClassTutorialService(navManager);
+        classTutorials = await classTutorialService.GetClassTutorialsByClassIdAsync(0);
+    }
+
+    protected async Task Search()
+    {
+        var service = new TutorialService(navManager);
+        tutorials = await service.GetTutorialAsync();
+        if (!string.IsNullOrEmpty(SearchString))
+        {
+            tutorials = tutorials!.Where(s => s.Tags!.Contains(SearchString)).ToList();
+        }
+    }
+
+    private async Task SaveSelectedTutorials()
+    {
+
+        // @foreach (var tutorial in tutorials)
+        // {
+        //     if (tutorial.IsChecked)
+        //     {
+        //         // Code to handle checked checkbox
+        //     }
+       // }       
+    }
+}
+
+

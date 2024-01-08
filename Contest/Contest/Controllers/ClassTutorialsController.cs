@@ -29,13 +29,13 @@ namespace Contest.Controllers
             )
         {
             var query = from ct in _context.ClassTutorial
-                        join t in _context.Tutorial on ct.TuturoialId equals t.TutorialId
+                        join t in _context.Tutorial on ct.TutorialId equals t.TutorialId
                         where ct.ClassId == classId
                         select new ClassTutorialResponse
                         {
                             ClassTutorialId = ct.ClassTutorialId,
                             ClassId = ct.ClassId,
-                            TuturoialId = ct.TuturoialId,
+                            TutorialId = ct.TutorialId,
                             Tutorial = t
                         };
 

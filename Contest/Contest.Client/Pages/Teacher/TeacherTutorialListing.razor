@@ -1,0 +1,91 @@
+﻿@page "/teacher/tutorial-listing"
+
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
+
+<Header />
+<h3>Tutorials By Class</h3>
+
+@if (classes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @if (classes.Count == 0)
+    {
+        <p><em>No Classes found.</em></p>
+    }
+    else
+    {
+        <select class="form-select" aria-label="Default select example" @onchange="SelectClass">
+            <option selected value="0">Select a class</option>
+            @foreach (var item in classes)
+            {
+                <option value="@item.ClassId">@item.ClassName</option>
+            }
+        </select>
+    }
+}
+
+@if (ShowTutorials)
+{
+    <br />
+    <h3>Tutorials</h3>
+    @if (tutorials == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        @if (tutorials.Count == 0)
+        {
+            <p><em>No Tutorials found.</em></p>
+        }
+        else
+        {
+            <p><em>Tutorials Found: @tutorials.Count</em></p>
+           
+            <ul class="list-group">
+                @foreach (var tutorial in tutorials)
+                {
+                    <li class="list-group-item">
+                        <input class="form-check-input me-1" type="checkbox" id="@tutorial.TutorialId">
+                        <label class="form-check-label" for="@tutorial.TutorialId">
+                            <b>@tutorial.Tutorial.Title</b>
+                            <div>@tutorial.Tutorial.Description</div>
+                        </label>
+                    </li>
+                }
+            </ul>
+        }
+    }
+}
+
+@code {
+    private List<Class>? classes;
+    private bool ShowTutorials = false;
+    private List<ClassTutorialResponse>? tutorials;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var service = new ClassService(navManager);
+        classes = await service.GetClassAsync();
+    }
+
+    protected async Task SelectClass(ChangeEventArgs e)
+    {
+        if (e.Value.ToString() == "0")
+        {
+            ShowTutorials = false;
+            return;
+        }
+
+        tutorials = new List<ClassTutorialResponse>();
+        ShowTutorials = true;
+
+        var classTutorialService = new ClassTutorialService(navManager);
+        tutorials = await classTutorialService.GetClassTutorialsByClassIdAsync(int.Parse(e.Value.ToString()));
+    }
+}

@@ -7,12 +7,7 @@
 
 <PageTitle>Class Edit</PageTitle>
 <Header />
-@* <nav>
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="classlisting">Classes</a></li>
-        <li class="breadcrumb-item active">Edit</li>
-    </ol>
-</nav> *@
+
 <h3>Class Edit </h3>
 
 @if (classes == null)
@@ -43,27 +38,43 @@ else
             <DataAnnotationsValidator />
 
             <br />
-            <button type="submit" class="btn btn-primary mr-auto">Save</button>
-            <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel">Cancel</button>
+            <button type="submit" class="btn btn-primary mr-auto" title="Save"><i class="bi bi-save"></i></button>
+            <button type="button" class="btn btn-secondary mr-auto" title="Cancel" @onclick="EditCancel"><i class="bi bi-x-square"></i></button>
             @if (classes.ClassId > 0)
             {
                 <span> | </span>
-                <button type="button" class="btn btn-danger mr-auto" @onclick="Delete">Delete</button>
+                <button type="button" class="btn btn-danger mr-auto" title="Delete" @onclick="Delete"><i class="bi bi-trash-fill"></i></button>
             }
         </EditForm>
-
+        <hr />
         @if (tutorials == null)
         {
             <p><em>Loading...</em></p>
         }
         else
         {
-@*             <h3>
+            <h3>
                 Tutorials
-                <a href="teacher/tutorial-edit/@tutorial.TutorialId/0"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
-            </h3> *@
-        }
+                <a href="teacher/tutorial-add"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
+            </h3> @if (tutorials.Count == 0)
+            {
+                <p><em>No Tutorials found.</em></p>
+            }
+            else
+            {
+                <p><em>Tutorials Found:@tutorials.Count</em></p>
 
+                <ul>
+                    @foreach (var tutorial in tutorials)
+                    {
+                        <div class="pb-2">
+                            <a class="btn btn-sm btn-primary" href="teacher/tutorial-edit/@tutorial.TutorialId"><i class="bi bi-pencil-fill"></i></a>
+                            <span class="b-2"> @tutorial.Tutorial!.Title</span>
+                        </div>
+                    }
+                </ul>
+            }
+        }
     </div>
 
     <br />

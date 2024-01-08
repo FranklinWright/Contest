@@ -18,7 +18,7 @@
     <a href="tutorialedit\0"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
 </h3>
 
-@if (tutorial == null)
+@if (tutorials == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -28,16 +28,16 @@ else
         <input type="text" @bind="SearchString" placeholder="Search" /> <button class="btn btn-sm btn-primary" @onclick="Search"><i class="bi bi-search"></i></button>
     </div>
 
-    @if (tutorial.Count == 0)
+    @if (tutorials.Count == 0)
     {
         <p><em>No Tutorials found.</em></p>
     }
     else
     {
-        <p><em>Found @tutorial.Count Tutorials.</em></p>
+        <p><em>Found @tutorials.Count Tutorials.</em></p>
 
         <ul>
-            @foreach (var tutorial in tutorial)
+            @foreach (var tutorial in tutorials)
             {
                 <div class="pb-2">
                     <a class="btn btn-sm btn-primary" href="tutorialedit\@tutorial.TutorialId"><i class="bi bi-pencil-fill"></i></a>
@@ -49,22 +49,22 @@ else
 }
 
 @code {
-    private List<Tutorial>? tutorial;
+    private List<Tutorial>? tutorials;
     private string? SearchString { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var service = new TutorialService(navManager);
-        tutorial = await service.GetTutorialAsync();
+        tutorials = await service.GetTutorialAsync();
     }
 
     protected async Task Search()
     {
         var service = new TutorialService(navManager);
-        tutorial = await service.GetTutorialAsync();
+        tutorials = await service.GetTutorialAsync();
         if (!string.IsNullOrEmpty(SearchString))
         {
-            tutorial = tutorial!.Where(s => s.Tags.Contains(SearchString)).ToList();
+            tutorials = tutorials!.Where(s => s.Tags.Contains(SearchString)).ToList();
         }
     }
 }
