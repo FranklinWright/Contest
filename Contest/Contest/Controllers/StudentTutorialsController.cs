@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Contest.Data;
 using Contest.Shared;
-using Contest.Migrations;
 
 namespace Contest.Controllers
 {

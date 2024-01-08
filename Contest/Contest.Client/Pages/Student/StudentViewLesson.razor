@@ -5,6 +5,15 @@
 @inject NavigationManager navManager
 @using Microsoft.AspNetCore.Authorization
 
+<nav>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="student/classlisting">Classes</a></li>
+        <li class="breadcrumb-item active">Class</li>
+    </ol>
+</nav>
+
+
+
 @if(lesson == null)
 {
     <p><em>Loading...</em></p>
@@ -13,6 +22,7 @@ else
 {
     <h3>@lesson[lessonPlace].Title</h3>
     <body>@lesson[lessonPlace].Body</body>
+    <button type="button" class="btn btn-danger mr-auto" @onclick="Next"><i class="bi bi-arrow-right"></i></button>
 }
 
 
@@ -54,6 +64,11 @@ else
 
         }
 
+    }
+
+    private async void Next()
+    {
+        
     }
 
 }
