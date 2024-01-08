@@ -152,6 +152,16 @@ namespace Contest.Controllers
                 @classUser.UserId = (Guid)userId;
             }
 
+            var existingClassUser = await _context.ClassUser
+        .FirstOrDefaultAsync(cu => cu.ClassId == classUser.ClassId && cu.UserId == classUser.UserId);
+
+            if (existingClassUser != null)
+            {
+                // If an entry with the same classId and UserId already exists, return a conflict response
+                return Conflict("This combination of classId and UserId already exists.");
+            }
+
+
             _context.ClassUser.Add(classUser);
             await _context.SaveChangesAsync();
 

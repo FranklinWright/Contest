@@ -5,7 +5,7 @@
 @inject NavigationManager navManager
 @using Microsoft.AspNetCore.Authorization
 
-<PageTitle>Class Edit</PageTitle>
+<PageTitle>Class Join</PageTitle>
 <div class="alert alert-info">Student</div>
 @* <nav>
     <ol class="breadcrumb">
@@ -87,13 +87,18 @@ else
             var success = await service.CreateClassUserAsync(classUser!);
             if (!success)
             {
-                ErrorMessages["Message"] = "Error creating secret classUser.";
+                ErrorMessages["Message"] = "Already in class!";
                 ShowErrorMsg = true;
             }
             else
             {
                 navManager.NavigateTo("student/classlisting");
             }
+        }
+        else
+        {
+            ErrorMessages["Message"] = "CODE NOT FOUND";
+            ShowErrorMsg = true;
         }
 
     }

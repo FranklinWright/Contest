@@ -31,7 +31,7 @@ else
             @foreach (var item in classes)
             {
                 <div class="pb-2">
-                    <a class="btn btn-sm btn-primary" href="teacher\class-edit\@item.ClassId"><i class="bi bi-pencil-fill"></i></a>
+                    <a class="btn btn-sm btn-primary" href="/student/class/@item.ClassId"><i class="bi bi-eye"></i></a>
                     <span class="b-2"> @item.ClassName</span>
                 </div>
             }

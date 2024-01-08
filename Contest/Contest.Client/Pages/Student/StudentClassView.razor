@@ -1,0 +1,53 @@
+﻿@page "/student/class/{classId:int}"
+
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
+@using Microsoft.AspNetCore.Authorization
+
+
+ <nav>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="student/classlisting">Classes</a></li>
+        <li class="breadcrumb-item active">Class</li>
+    </ol>
+</nav>
+
+@if (classes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h1>@classes.ClassName Class</h1>
+}
+
+@code {
+    [Parameter] public int classId { get; set; }
+
+    private Class? classes = new Class();
+    private List<ClassTutorialResponse>? tutorials;
+    protected bool ShowErrorMsg = false;
+    protected Dictionary<string, string> ErrorMessages = new Dictionary<string, string>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (classId > 0)
+        {
+            try
+            {
+                var service = new ClassService(navManager);
+                classes = await service.GetClassAsync(classId);
+
+                var classTutorialService = new ClassTutorialService(navManager);
+                tutorials = await classTutorialService.GetClassTutorialsByClassIdAsync(classId);
+            }
+            catch (Exception ex)
+            {
+                ErrorMessages["Message"] = ex.Message;
+                ShowErrorMsg = true;
+            }
+        }
+    }
+
+}
