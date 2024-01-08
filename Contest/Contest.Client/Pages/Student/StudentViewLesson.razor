@@ -1,9 +1,59 @@
-﻿@page "/student/tutorial/{tutorialId:int}/{lessonId:int}"
+﻿@page "/student/tutorial/{tutorialId:int}/{lessonPlace:int}"
 
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
+@using Microsoft.AspNetCore.Authorization
 
-<h3>StudentViewLesson</h3>
+@if(lesson == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h3>@lesson[lessonPlace].Title</h3>
+    <body>@lesson[lessonPlace].Body</body>
+}
 
 
 @code {
+    [Parameter] public int tutorialId { get; set; }
+    [Parameter] public int lessonPlace { get; set; }
+    private List<Lesson>? lesson;
+    private Tutorial? tutorial;
+    private List<StudentTutorial>? students;
+    private StudentTutorial? student;
+
+    protected override async Task OnParametersSetAsync()
+    {
+
+        var service = new LessonService(navManager);
+        lesson = await service.GetLessonAsyncInOrder(tutorialId);
+        var service2 = new TutorialService(navManager);
+        tutorial = await service2.GetTutorialAsync(tutorialId);
+        var service3 = new StudentTutorialService(navManager);
+        students = await service3.GetStudentTutorialAsync();
+        if(students != null)
+        {
+            bool check = true;
+            foreach (StudentTutorial st in students)
+            {
+                if (st.TutorialId == tutorialId)
+                {
+                    student = st;
+                    check = false;
+                    break;
+                }
+            }
+            if(check)
+            {
+                student = new StudentTutorial();
+                student.StudentTutorialId = tutorialId;
+                var success = service3.CreateStudentTutorialAsync(student);
+            }
+
+        }
+
+    }
 
 }

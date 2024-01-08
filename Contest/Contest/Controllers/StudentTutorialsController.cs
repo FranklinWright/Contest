@@ -7,12 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Contest.Data;
 using Contest.Shared;
+using Contest.Migrations;
 
 namespace Contest.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StudentTutorialsController : ControllerBase
+    public class StudentTutorialsController : MyController
     {
         private readonly ApplicationDbContext _context;
 
@@ -25,7 +26,8 @@ namespace Contest.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentTutorial>>> GetStudentTutorial()
         {
-            return await _context.StudentTutorial.ToListAsync();
+            var userId = GetUserId();
+            return await _context.StudentTutorial.Where(c => c.UserId == userId).ToListAsync();
         }
 
         // GET: api/StudentTutorials/5
@@ -78,6 +80,17 @@ namespace Contest.Controllers
         [HttpPost]
         public async Task<ActionResult<StudentTutorial>> PostStudentTutorial(StudentTutorial studentTutorial)
         {
+            var userId = GetUserId();
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            else
+            {
+                @studentTutorial.UserId = (Guid)userId;
+            }
+
             _context.StudentTutorial.Add(studentTutorial);
             await _context.SaveChangesAsync();
 
