@@ -1,4 +1,4 @@
-﻿@page "/student/tutorial/{tutorialId:int}/{lessonPlace:int}"
+﻿@page "/student/quiz/{tutorialId:int}/{lessonPlace:int}"
 
 @using Contest.Client.Services
 @rendermode InteractiveAuto
@@ -14,27 +14,34 @@
 
 
 
-@if(lesson == null)
+@if (lesson == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <h3>@lesson[lessonPlace].Title</h3>
-    <body>@lesson[lessonPlace].Body</body>
-    @if(lessonPlace > 0)
-    {
-        <button type="button" class="btn btn-danger mr-auto" @onclick="Back"><i class="bi bi-arrow-left"></i></button>
-    }
-    @if (lessonPlace < tutorial!.LessonCount - 1)
-    {
-        <button type="button" class="btn btn-success mr-auto" @onclick="Next"><i class="bi bi-arrow-right"></i></button>
-    }
-    @if (lessonPlace == tutorial!.LessonCount - 1)
-    {
-        <body>                    </body>
-        <button type="button" class="btn btn-primary mr-auto" @onclick="Quiz"><i class="bi bi-clipboard-x"></i></button>
-    }
+    <h1>@tutorial.Title's Quiz</h1>
+    
+    <div class="form-check">
+    <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" @bind="selectedOption">
+    <label class="form-check-label" for="exampleRadios1">
+        Default radio
+    </label>
+</div>
+<div class="form-check">
+    <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" @bind="selectedOption">
+    <label class="form-check-label" for="exampleRadios2">
+        Second default radio
+    </label>
+</div>
+
+<button @onclick="CaptureSelection">Capture Selection</button>
+
+<br />
+    <h1>@SaveselectedOption</h1>
+
+
+   
 
 }
 
@@ -46,6 +53,8 @@ else
     private TutorialResponse? tutorial;
     private List<StudentTutorial>? students;
     private StudentTutorial? student;
+    private string selectedOption;
+    private string SaveselectedOption;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -57,7 +66,7 @@ else
         var service3 = new StudentTutorialService(navManager);
         students = await service3.GetStudentTutorialAsync();
         bool check = true;
-        if(students != null)
+        if (students != null)
         {
 
             foreach (StudentTutorial st in students)
@@ -80,28 +89,13 @@ else
 
     }
 
-    private async void Next()
+    private void CaptureSelection()
     {
-        if (lessonPlace >= student!.CompletedLessons)
-        {
-            student.CompletedLessons++;
-            var service2 = new StudentTutorialService(navManager);
-            var success = await service2.UpdateStudentTutorialAsync(student!);
-        }
-        navManager.NavigateTo("/student/tutorial/" + tutorialId + "/" + (lessonPlace + 1));
+        // Use the selectedOption variable to access the selected radio button value
+        Console.WriteLine($"Selected option: {selectedOption}");
 
+        // You can perform further actions with the selected value here
     }
 
-    private async void Back()
-    {
-        navManager.NavigateTo("/student/tutorial/" + tutorialId + "/" + (lessonPlace - 1));
-
-    }
-
-    private async void Quiz()
-    {
-        navManager.NavigateTo("/student/tutorial/" + tutorialId + "/" + (lessonPlace - 1));
-
-    }
 
 }
