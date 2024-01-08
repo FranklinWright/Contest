@@ -1,4 +1,5 @@
 ﻿@page "/teacher/tutorial-listing"
+@page "/teacher/tutorial-listing/{Id:int}"
 
 @using Contest.Client.Services
 @rendermode InteractiveAuto
@@ -23,7 +24,13 @@ else
             <option selected value="0">Select a class</option>
             @foreach (var item in classes)
             {
-                <option value="@item.ClassId">@item.ClassName</option>
+                if (item.ClassId == classId)
+                {
+                    <option value="@item.ClassId" selected>@item.ClassName</option>
+                }
+                else{
+                    <option value="@item.ClassId">@item.ClassName</option>
+                }
             }
         </select>
     }
@@ -32,7 +39,9 @@ else
 @if (ShowTutorials)
 {
     <br />
-    <h3>Tutorials</h3>
+    <h3>Tutorials
+        <a href="teacher/tutorial-add/@classId"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
+    </h3>
     @if (tutorials == null)
     {
         <p><em>Loading...</em></p>
@@ -51,8 +60,8 @@ else
                 @foreach (var tutorial in tutorials)
                 {
                     <li class="list-group-item">
-                        <input class="form-check-input me-1" type="checkbox" id="@tutorial.TutorialId">
-                        <label class="form-check-label" for="@tutorial.TutorialId">
+                        <button type="button" class="btn btn-danger align-top" @onclick="() => DeleteTutorial(tutorial.ClassTutorialId)" title="Delete"><i class="bi bi-trash-fill"></i></button>
+                        <label class="form-check-label ps-2" for="@tutorial.TutorialId">
                             <b>@tutorial.Tutorial.Title</b>
                             <div>@tutorial.Tutorial.Description</div>
                         </label>
@@ -64,28 +73,54 @@ else
 }
 
 @code {
+    [Parameter] public int Id { get; set; }
+
     private List<Class>? classes;
     private bool ShowTutorials = false;
     private List<ClassTutorialResponse>? tutorials;
+    private int classId = 0;
 
     protected override async Task OnInitializedAsync()
     {
+        classId = Id;
         var service = new ClassService(navManager);
         classes = await service.GetClassAsync();
+
+        if (classId > 0)
+        {
+            await DisplayTutorials();
+        };
     }
 
     protected async Task SelectClass(ChangeEventArgs e)
     {
-        if (e.Value.ToString() == "0")
+        classId = int.Parse(e.Value.ToString());
+
+        if (classId == 0)
         {
             ShowTutorials = false;
             return;
         }
 
+        await DisplayTutorials();
+    }
+
+    private async Task DisplayTutorials()
+    {
         tutorials = new List<ClassTutorialResponse>();
         ShowTutorials = true;
 
         var classTutorialService = new ClassTutorialService(navManager);
-        tutorials = await classTutorialService.GetClassTutorialsByClassIdAsync(int.Parse(e.Value.ToString()));
+        tutorials = await classTutorialService.GetClassTutorialsByClassIdAsync(classId);
     }
+
+    private async Task DeleteTutorial(int classTuturialId)
+    {
+        if (classTuturialId > 0)
+        {
+            var classTutorialService = new ClassTutorialService(navManager);
+            await classTutorialService.DeleteClassTutorialAsync(classTuturialId);
+            navManager.NavigateTo("/teacher/tutorial-listing", true);
+        }
+    } 
 }

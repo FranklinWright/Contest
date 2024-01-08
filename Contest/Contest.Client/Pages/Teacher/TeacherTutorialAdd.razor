@@ -11,7 +11,7 @@
     Tutorial Listing
 </h3>
 
-@if (tutorials == null)
+@if (!ShowTutorials)
 {
     <p><em>Loading...</em></p>
 }
@@ -29,25 +29,17 @@ else
     {
         <p><em>Tutorials Found: @tutorials.Count</em></p>
 
-        <h4>Select the tutorials to add to the class.</h4>
-@*         @foreach (var tutorial in tutorials)
-        {
-            <div class="pb-2">
-                <div> <b>@tutorial.Title</b></div>
-                <div>@tutorial.Description</div>
-            </div>
-        } *@
-
+        <h4>Select Tutorials</h4>
         <ul class="list-group">
             @foreach (var tutorial in tutorials)
             {
-            <li class="list-group-item">
-                <input class="form-check-input me-1" type="checkbox" id="@tutorial.TutorialId">
-                <label class="form-check-label" for="@tutorial.TutorialId">
-                    <b>@tutorial.Title</b>
-                    <div>@tutorial.Description</div>
-                </label>
-            </li>
+                <li class="list-group-item">
+                    <input class="form-check-input me-1" type="checkbox" id="@tutorial.TutorialId" @onchange="() => CheckboxChanged(tutorial.TutorialId)">
+                    <label class="form-check-label" for="@tutorial.TutorialId">
+                        <b>@tutorial.Title</b>
+                        <div>@tutorial.Description</div>
+                    </label>
+                </li>
             }
         </ul>
         <br />
@@ -56,9 +48,13 @@ else
 }
 
 @code {
+    [Parameter] public int classId { get; set; }
+
+    private bool ShowTutorials = false;
     private List<Tutorial>? tutorials;
     private string? SearchString { get; set; }
     private List<ClassTutorialResponse>? classTutorials;
+    private List<int> newTutorials = new List<int>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -66,29 +62,58 @@ else
         tutorials = await service.GetTutorialAsync();
 
         var classTutorialService = new ClassTutorialService(navManager);
-        classTutorials = await classTutorialService.GetClassTutorialsByClassIdAsync(0);
+        classTutorials = await classTutorialService.GetClassTutorialsByClassIdAsync(classId);
+
+        // Remove tutorials that are already added to the class
+        foreach (var classTutorial in classTutorials)
+        {
+            tutorials.Remove(tutorials.FirstOrDefault(t => t.TutorialId == classTutorial.TutorialId));
+        }
+
+        ShowTutorials = true;
     }
 
     protected async Task Search()
     {
+        ShowTutorials = false;
+
         var service = new TutorialService(navManager);
         tutorials = await service.GetTutorialAsync();
         if (!string.IsNullOrEmpty(SearchString))
         {
             tutorials = tutorials!.Where(s => s.Tags!.Contains(SearchString)).ToList();
         }
+
+        // Remove tutorials that are already added to the class
+        foreach (var classTutorial in classTutorials)
+        {
+            tutorials.Remove(tutorials.FirstOrDefault(t => t.TutorialId == classTutorial.TutorialId));
+        }
+
+        ShowTutorials = true;
+    }
+
+    private void CheckboxChanged(int tutorialId)
+    {
+        if (newTutorials.Contains(tutorialId))
+        {
+            newTutorials.Remove(tutorialId);
+        }
+        else
+        {
+            newTutorials.Add(tutorialId);
+        }
     }
 
     private async Task SaveSelectedTutorials()
     {
+        var classTutorialService = new ClassTutorialService(navManager);
+        foreach (var item in newTutorials)
+        {
+            await classTutorialService.CreateClassTutorialAsync(new ClassTutorial { ClassId = classId, TutorialId = item });
+        }
 
-        // @foreach (var tutorial in tutorials)
-        // {
-        //     if (tutorial.IsChecked)
-        //     {
-        //         // Code to handle checked checkbox
-        //     }
-       // }       
+        navManager.NavigateTo($"teacher/tutorial-listing/{classId}");
     }
 }
 
