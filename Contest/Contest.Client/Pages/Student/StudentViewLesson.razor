@@ -26,7 +26,15 @@ else
     {
         <button type="button" class="btn btn-danger mr-auto" @onclick="Back"><i class="bi bi-arrow-left"></i></button>
     }
-    <button type="button" class="btn btn-success mr-auto" @onclick="Next"><i class="bi bi-arrow-right"></i></button>
+    @if (lessonPlace < tutorial!.LessonCount - 1)
+    {
+        <button type="button" class="btn btn-success mr-auto" @onclick="Next"><i class="bi bi-arrow-right"></i></button>
+    }
+    @if (lessonPlace == tutorial!.LessonCount - 1)
+    {
+        
+    }
+
 }
 
 
