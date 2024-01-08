@@ -26,9 +26,14 @@ else
                 </div>
             </div>
             <div class="mb-3">
-                <label for="exampleFormControlTextarea1" class="form-label">Description</label>
+                <label for="tutorial.Description" class="form-label">Description</label>
                 <textarea class="form-control" @bind="tutorial.Description" rows="3"></textarea>
                 <ValidationMessage For="@(() => tutorial.Description)" />
+            </div>
+            <div class="mb-3">
+                <label for="tutorial.Tags" class="form-label">Tags</label>
+                <InputText class="form-control" @bind-Value="tutorial.Tags" />
+                <ValidationMessage For="@(() => tutorial.Tags)" />
             </div>
             <DataAnnotationsValidator />
             <button type="submit" class="btn btn-success mr-auto"><i class="bi bi-save"></i></button>
