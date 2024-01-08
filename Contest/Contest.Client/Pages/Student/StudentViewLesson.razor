@@ -22,7 +22,11 @@ else
 {
     <h3>@lesson[lessonPlace].Title</h3>
     <body>@lesson[lessonPlace].Body</body>
-    <button type="button" class="btn btn-danger mr-auto" @onclick="Next"><i class="bi bi-arrow-right"></i></button>
+    @if(lessonPlace > 0)
+    {
+        <button type="button" class="btn btn-danger mr-auto" @onclick="Back"><i class="bi bi-arrow-left"></i></button>
+    }
+    <button type="button" class="btn btn-success mr-auto" @onclick="Next"><i class="bi bi-arrow-right"></i></button>
 }
 
 
@@ -43,9 +47,10 @@ else
         tutorial = await service2.GetTutorialAsync(tutorialId);
         var service3 = new StudentTutorialService(navManager);
         students = await service3.GetStudentTutorialAsync();
+        bool check = true;
         if(students != null)
         {
-            bool check = true;
+
             foreach (StudentTutorial st in students)
             {
                 if (st.TutorialId == tutorialId)
@@ -55,20 +60,33 @@ else
                     break;
                 }
             }
-            if(check)
-            {
-                student = new StudentTutorial();
-                student.StudentTutorialId = tutorialId;
-                var success = service3.CreateStudentTutorialAsync(student);
-            }
 
+        }
+        if (check)
+        {
+            student = new StudentTutorial();
+            student.TutorialId = tutorialId;
+            var success = service3.CreateStudentTutorialAsync(student);
         }
 
     }
 
     private async void Next()
     {
-        
+        if (lessonPlace >= student!.CompletedLessons)
+        {
+            student.CompletedLessons++;
+            var service2 = new StudentTutorialService(navManager);
+            var success = await service2.UpdateStudentTutorialAsync(student!);
+        }
+        navManager.NavigateTo("/student/tutorial/" + tutorialId + "/" + (lessonPlace + 1));
+
+    }
+
+    private async void Back()
+    {
+        navManager.NavigateTo("/student/tutorial/" + tutorialId + "/" + (lessonPlace - 1));
+
     }
 
 }
