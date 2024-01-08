@@ -64,7 +64,7 @@ else
     [Parameter] public int lessonId { get; set; }
     [Parameter] public int tutorialId { get; set; }
     private Lesson? lesson = new Lesson();
-    private Tutorial? tutorial = new Tutorial();
+    private TutorialResponse? tutorial = new TutorialResponse();
     protected bool ShowErrorMsg = false;
     protected Dictionary<string, string> ErrorMessages = new Dictionary<string, string>();
 

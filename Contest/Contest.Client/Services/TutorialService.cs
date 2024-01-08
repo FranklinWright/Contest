@@ -16,16 +16,16 @@ namespace Contest.Client.Services
             _httpClient.BaseAddress = new Uri(_navigationManager.BaseUri);
         }
 
-        public async Task<List<Tutorial>?> GetTutorialAsync()
+        public async Task<List<TutorialResponse>?> GetTutorialAsync()
         {
-                var tutorial = await _httpClient.GetFromJsonAsync<List<Tutorial>>("api/Tutorials");
+                var tutorial = await _httpClient.GetFromJsonAsync<List<TutorialResponse>>("api/Tutorials");
                 return tutorial;
         }
         
-        public async Task<Tutorial?> GetTutorialAsync(int tutorialId)
+        public async Task<TutorialResponse?> GetTutorialAsync(int tutorialId)
         {
             string endpoint = $"api/Tutorials/{tutorialId}";
-            var tutorial = await _httpClient.GetFromJsonAsync<Tutorial>(endpoint);
+            var tutorial = await _httpClient.GetFromJsonAsync<TutorialResponse>(endpoint);
             return tutorial;
         }
 

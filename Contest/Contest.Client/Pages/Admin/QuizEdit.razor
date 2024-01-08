@@ -92,7 +92,7 @@ else
     [Parameter] public int quizId { get; set; }
     [Parameter] public int tutorialId { get; set; }
     private Quiz? quiz = new Quiz();
-    private Tutorial? tutorial = new Tutorial();
+    private TutorialResponse? tutorial = new TutorialResponse();
     protected bool ShowErrorMsg = false;
     protected Dictionary<string, string> ErrorMessages = new Dictionary<string, string>();
 

@@ -113,7 +113,7 @@ else
 @code {
     [Parameter] public int tutorialId { get; set; }
 
-    private Tutorial? tutorial = new Tutorial();
+    private TutorialResponse? tutorial = new TutorialResponse();
     protected bool ShowErrorMsg = false;
     protected Dictionary<string, string> ErrorMessages = new Dictionary<string, string>();
 
@@ -140,7 +140,13 @@ else
         var service = new TutorialService(navManager);
         if (tutorial!.TutorialId == 0)
         {
-            var success = await service.CreateTutorialAsync(tutorial!);
+            var newTutorial = new Tutorial
+            {
+                Title = tutorial.Title,
+                Description = tutorial.Description,
+                Tags = tutorial.Tags
+            };
+            var success = await service.CreateTutorialAsync(newTutorial);
             if (!success)
             {
                 ErrorMessages["Message"] = "Error creating tutorial.";
@@ -153,7 +159,14 @@ else
         }
         else
         {
-            var success = await service.UpdateTutorialAsync(tutorial!);
+            var updatedTutorial = new Tutorial
+            {
+                TutorialId = tutorial.TutorialId,
+                Title = tutorial.Title,
+                Description = tutorial.Description,
+                Tags = tutorial.Tags
+            };
+            var success = await service.UpdateTutorialAsync(updatedTutorial);
             if (!success)
             {
                 ErrorMessages["Message"] = "Error updating tutorial.";

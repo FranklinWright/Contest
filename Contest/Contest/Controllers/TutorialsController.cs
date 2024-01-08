@@ -23,23 +23,42 @@ namespace Contest.Controllers
 
         // GET: api/Tutorials
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Tutorial>>> GetTutorial()
+        public async Task<ActionResult<IEnumerable<TutorialResponse>>> GetTutorial()
         {
-            return await _context.Tutorial.OrderBy(t => t.Title).ToListAsync();
+            var query = from t in _context.Tutorial
+                        select new TutorialResponse
+                        {
+                            TutorialId = t.TutorialId,
+                            Title = t.Title,
+                            Description = t.Description,
+                            Tags = t.Tags,
+                            LessonCount = _context.Lesson.Where(l => l.TutorialId == t.TutorialId).Count()
+                        };
+
+            return Ok(await query.ToListAsync());
         }
 
         // GET: api/Tutorials/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Tutorial>> GetTutorial(int id)
+        public async Task<ActionResult<TutorialResponse>> GetTutorial(int id)
         {
-            var tutorial = await _context.Tutorial.FindAsync(id);
+            var query = from t in _context.Tutorial
+                        where t.TutorialId == id
+                        select new TutorialResponse
+                        {
+                            TutorialId = t.TutorialId,
+                            Title = t.Title,
+                            Description = t.Description,
+                            Tags = t.Tags,
+                            LessonCount = _context.Lesson.Where(l => l.TutorialId == t.TutorialId).Count()
+                        };
 
-            if (tutorial == null)
+            if (query == null)
             {
                 return NotFound();
             }
 
-            return tutorial;
+            return Ok(await query.FirstOrDefaultAsync());
         }
 
         // PUT: api/Tutorials/5

@@ -6,12 +6,6 @@
 
 <PageTitle>Tutorials</PageTitle>
 <Header />
-@* <nav>
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="adminmenu">Admin Menu</a></li>
-        <li class="breadcrumb-item active">Tutorial Listing</li>
-    </ol>
-</nav> *@
 
 <h3>
     Tutorial Listing
@@ -35,21 +29,23 @@ else
     else
     {
         <p><em>Found @tutorials.Count Tutorials.</em></p>
-
-        <ul>
+        <ul class="list-group">
             @foreach (var tutorial in tutorials)
             {
-                <div class="pb-2">
-                    <a class="btn btn-sm btn-primary" href="tutorialedit\@tutorial.TutorialId"><i class="bi bi-pencil-fill"></i></a>
-                    <span class="b-2"> @tutorial.Title</span>
-                </div>
+                <li class="list-group-item">
+                    <a class="btn btn-sm btn-primary align-top" href="tutorialedit\@tutorial.TutorialId"><i class="bi bi-pencil-fill"></i></a>
+                    <label class="form-check-label ps-2" for="@tutorial.TutorialId">
+                        <b>@tutorial.Title</b>
+                        <div>@tutorial.Description</div>
+                    </label>
+                </li>
             }
         </ul>
     }
 }
 
 @code {
-    private List<Tutorial>? tutorials;
+    private List<TutorialResponse>? tutorials;
     private string? SearchString { get; set; }
 
     protected override async Task OnInitializedAsync()
