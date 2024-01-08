@@ -13,13 +13,40 @@
     </ol>
 </nav>
 
-@if (classes == null)
+@if (classes == null || tutorials == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <h1>@classes.ClassName Class</h1>
+    <h1><u>@classes.ClassName Class</u></h1>
+    <br />
+    
+    @if (tutorials.Count == 0)
+    {
+        <p><em>No Tutorials found.</em></p>
+    }
+    else
+    {
+        <p><em>Tutorials Found: @tutorials.Count </em></p>
+
+        <ul>
+            @foreach (var tutorial in tutorials)
+            {
+                if (tutorial.Tutorial != null)
+                {
+                    <div class="pb-2">
+                        <a class="btn btn-sm btn-primary" href="home"><i class="bi bi-eye"></i></a>
+                        <span class="b-2"> @tutorial.Tutorial.Title: has completed 5% of it. Score Received ... </span>
+                    </div>
+                }
+            }
+        </ul>
+    }
+    
+
+
+
 }
 
 @code {
@@ -29,6 +56,8 @@ else
     private List<ClassTutorialResponse>? tutorials;
     protected bool ShowErrorMsg = false;
     protected Dictionary<string, string> ErrorMessages = new Dictionary<string, string>();
+
+    
 
     protected override async Task OnParametersSetAsync()
     {
