@@ -13,7 +13,7 @@
     </ol>
 </nav>
 
-@if (classes == null || tutorials == null)
+@if (classes == null || tutorials == null || studentTutorials == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -28,32 +28,51 @@ else
     }
     else
     {
-        <p><em>Tutorials Found: @tutorials.Count </em></p>
 
-        <ul>
-            @foreach (var tutorial in tutorials)
-            {
-                if (tutorial != null)
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Tutorial Name</th>
+                    <th>Percentage Done</th>
+                    <th>Quiz Grade</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tutorial in tutorials)
                 {
                     var matchingStudentTutorial = studentTutorials.FirstOrDefault(st => st.TutorialId == tutorial.TutorialId);
                     if (matchingStudentTutorial != null)
                     {
-                        <div class="pb-2">
-                            <a class="btn btn-sm btn-primary" href="/student/tutorial/@tutorial.TutorialId/@matchingStudentTutorial.CompletedLessons"><i class="bi bi-eye"></i></a>
-                            <span class="b-2"> @tutorial.Title: has completed 10% of it. Score Received (Not Taken) </span>
-                        </div>
+                        int precent = ((matchingStudentTutorial.CompletedLessons +1) * 100 / (tutorial.LessonCount+1));
+                        <tr>
+
+                            <td>@tutorial.Title</td>
+                            <td>@precent%</td>
+                            <td>@matchingStudentTutorial.QuizScore%</td>
+                            <td><a class="btn btn-sm btn-primary" href="/student/tutorial/@tutorial.TutorialId/@matchingStudentTutorial.CompletedLessons"><i class="bi bi-eye"></i></a></td>
+                        </tr>
                     }
                     else
                     {
-                        <div class="pb-2">
-                            <a class="btn btn-sm btn-primary" href="/student/tutorial/@tutorial.TutorialId/0"><i class="bi bi-eye"></i></a>
-                            <span class="b-2"> @tutorial.Title: has completed 0% of it. Score Received (Not Taken) </span>
-                        </div>
+                        <tr>
+                    <td>@tutorial.Title</td>
+                    <td>0%</td>
+                    <td>0%</td>
+                    <td><a class="btn btn-sm btn-primary" href="/student/tutorial/@tutorial.TutorialId/0"><i class="bi bi-eye"></i></a></td>
+                    </tr>
                     }
-                    
                 }
-            }
-        </ul>
+            </tbody>
+        </table>
+
+
+
+
+         
+
+
+       
     }
     
 
@@ -65,12 +84,12 @@ else
     [Parameter] public int classId { get; set; }
 
     private Class? classes = new Class();
-    private List<Tutorial>? tutorials;
+    private List<TutorialResponse>? tutorials;
     protected bool ShowErrorMsg = false;
     protected Dictionary<string, string> ErrorMessages = new Dictionary<string, string>();
 
     private List<StudentTutorial>? studentTutorials;
-
+    private List<TutorialResponse>? tutorialStuff;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -83,16 +102,20 @@ else
 
                 var classTutorialService = new ClassTutorialService(navManager);
                 var tutorialsClass = await classTutorialService.GetClassTutorialsByClassIdAsync(classId);
-                tutorials = new List<Tutorial>();
-                
-                
-                if(tutorialsClass != null)
+                tutorials = new List<TutorialResponse>();
+
+                var service4 = new TutorialService(navManager);
+                tutorialStuff = await service4.GetTutorialAsync();
+                if(tutorialsClass != null && tutorialStuff != null)
                 {
                     foreach (ClassTutorialResponse tutorial in tutorialsClass)
                     {
-                        if (tutorial.Tutorial != null)
+                        foreach(TutorialResponse tutorialResponse in tutorialStuff)
                         {
-                            tutorials.Add(tutorial.Tutorial);
+                            if (tutorial.TutorialId.Equals(tutorialResponse.TutorialId))
+                            {
+                                tutorials.Add(tutorialResponse);
+                            }
                         }
                     }
                 }
@@ -100,7 +123,7 @@ else
                 var studentTutorialService = new StudentTutorialService(navManager);
                 studentTutorials = await studentTutorialService.GetStudentTutorialAsync();
 
-               
+                
 
 
             }
