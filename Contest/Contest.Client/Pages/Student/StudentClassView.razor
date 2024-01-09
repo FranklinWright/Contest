@@ -33,6 +33,7 @@ else
             <thead>
                 <tr>
                     <th>Tutorial Name</th>
+                    <th>Lessons</th>
                     <th>Percentage Done</th>
                     <th>Quiz Grade</th>
                     <th>Action</th>
@@ -43,6 +44,7 @@ else
                 {
                     <tr>
                         <td>@progress.Title</td>
+                        <td>@progress.LessonCount</td>
                         <td>
                             <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                                 <div class="progress-bar" style="width: @progress.PercentageDone%"></div>
@@ -116,6 +118,7 @@ else
                         {
                             TutorialId = tutorial.TutorialId,
                             Title = tutorial.Tutorial!.Title!,
+                            LessonCount = tutorial.LessonCount, 
                             NextLesson = nextLesson,
                             PercentageDone = ((progress!.CompletedLessons * 100) / tutorial.LessonCount),
                             QuizGrade = progress.QuizScore
@@ -138,6 +141,7 @@ else
     {
         public int TutorialId { get; set; }
         public string? Title { get; set; }
+        public int LessonCount { get; set; }
         public int NextLesson { get; set; }
         public int PercentageDone { get; set; }
         public int? QuizGrade { get; set; }
