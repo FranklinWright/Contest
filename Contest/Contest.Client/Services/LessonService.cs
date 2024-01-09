@@ -20,14 +20,13 @@ namespace Contest.Client.Services
         {
             try
             {
-                var lesson = await _httpClient.GetFromJsonAsync<List<Lesson>>("api/Lessons");
-                if (lesson != null)
+                var url = new UriBuilder(_navigationManager.BaseUri)
                 {
-                    var filteredLessons = lesson.Where(lesson => lesson.TutorialId == tutorialId).OrderBy(lesson => lesson.Order).ToList();
-                    return filteredLessons;
-                }
-
-                return lesson;
+                    Path = "api/Lessons",
+                    Query = $"tutorialId={tutorialId}"
+                }.ToString();
+                var result = await _httpClient.GetFromJsonAsync<List<Lesson>>(url);
+                return result;
             }
             catch (HttpRequestException ex)
             {

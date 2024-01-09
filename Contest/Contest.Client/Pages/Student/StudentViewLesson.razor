@@ -15,74 +15,63 @@
 else
 {
     <div style="color:navy">@tutorial!.Title</div>
-    <h3>@lesson[lessonPlace].Title</h3>
-    @((MarkupString)lesson[lessonPlace].Body)
+    <h1>@lesson[lessonPlace-1].Title</h1>
+    @((MarkupString)lesson[lessonPlace-1].Body)
     <hr />
     @if(lessonPlace > 0)
     {
-        <button type="button" class="btn btn-danger mr-auto" @onclick="Back" title="Previous Page"><i class="bi bi-arrow-left"></i></button>
+        <button type="button" class="btn btn-danger mr-auto" @onclick="Back" title="Previous Page"><i class="bi bi-arrow-left"></i> Previous</button>
     }
-    @if (lessonPlace < tutorial!.LessonCount - 1)
+    else
     {
-        <button type="button" class="btn btn-success mr-auto" @onclick="Next" title="Next Page"><i class="bi bi-arrow-right"></i></button>
+        <button type="button" class="btn btn-light mr-auto" disabled  title="Previous Page"><i class="bi bi-arrow-left"></i> Previous</button>
     }
-    @if (lessonPlace == tutorial!.LessonCount - 1)
+    <span class="ps-2 pe-2">Lesson @lessonPlace of @tutorial.LessonCount</span>
+    @if (lessonPlace < tutorial!.LessonCount)
     {
-        <button type="button" class="btn btn-primary mr-auto" @onclick="Quiz" title="Start Quiz"><i class="bi bi-clipboard-x"></i></button>
+        <button type="button" class="btn btn-success mr-auto" @onclick="Next" title="Next Page">Next <i class="bi bi-arrow-right"></i></button>
+    }
+    else
+    {
+        <button type="button" class="btn btn-light mr-auto" disabled title="Next Page">Next <i class="bi bi-arrow-right"></i></button>
+    }
+    @if (lessonPlace == tutorial!.LessonCount)
+    {
+        <hr />
+        <h3>Quiz Time</h3>
+        <div>This is the last lesson. Click the <b>Start Quiz</b> button when you are ready to take the quiz.</div>
+        <br />
+        <button type="button" class="btn btn-primary mr-auto" @onclick="Quiz" title="Start Quiz"><i class="bi bi-clipboard-x"></i> Start Quiz</button>
     }
 
 }
-
 
 @code {
     [Parameter] public int tutorialId { get; set; }
     [Parameter] public int lessonPlace { get; set; }
     private List<Lesson>? lesson;
     private TutorialResponse? tutorial;
-    private List<StudentTutorial>? students;
-    private StudentTutorial? student;
 
     protected override async Task OnParametersSetAsync()
     {
-        lessonPlace = lessonPlace - 1;
-        var service = new LessonService(navManager);
-        lesson = await service.GetLessonAsyncInOrder(tutorialId);
-        var service2 = new TutorialService(navManager);
-        tutorial = await service2.GetTutorialAsync(tutorialId);
-        var service3 = new StudentTutorialService(navManager);
-       // students = await service3.GetStudentTutorialAsync();
-        bool check = true;
-        if(students != null)
-        {
-
-            foreach (StudentTutorial st in students)
-            {
-                if (st.TutorialId == tutorialId)
-                {
-                    student = st;
-                    check = false;
-                    break;
-                }
-            }
-
-        }
-        if (check)
-        {
-            student = new StudentTutorial();
-            student.TutorialId = tutorialId;
-            var success = service3.CreateStudentTutorialAsync(student);
-        }
-
+        var lessonService = new LessonService(navManager);
+        lesson = await lessonService.GetLessonAsyncInOrder(tutorialId);
+        var tutorialService = new TutorialService(navManager);
+        tutorial = await tutorialService.GetTutorialAsync(tutorialId);
     }
 
     private async void Next()
     {
-        if (lessonPlace >= student!.CompletedLessons)
+        var studentService = new StudentTutorialService(navManager);
+        var studentsProgress = await studentService.GetStudentTutorialByTutorialIdAsync(tutorialId);
+        var progress = studentsProgress.FirstOrDefault();
+
+        if (lessonPlace >= progress!.CompletedLessons)
         {
-            student.CompletedLessons++;
-            var service2 = new StudentTutorialService(navManager);
-            var success = await service2.UpdateStudentTutorialAsync(student!);
+            progress!.CompletedLessons = lessonPlace;
+            var success = await studentService.UpdateStudentTutorialAsync(progress!);
         }
+
         navManager.NavigateTo("/student/tutorial/" + tutorialId + "/" + (lessonPlace + 1));
 
     }
@@ -95,7 +84,7 @@ else
 
     private async void Quiz()
     {
-        navManager.NavigateTo("/student/tutorial/" + tutorialId + "/" + (lessonPlace - 1));
+        navManager.NavigateTo("/student/quiz/" + tutorialId);
 
     }
 

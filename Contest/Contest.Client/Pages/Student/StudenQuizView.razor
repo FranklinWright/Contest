@@ -1,0 +1,15 @@
+﻿@page "/student/quiz/{tutorialId:int}"
+
+@using Contest.Client.Services
+@rendermode InteractiveAuto
+@inject NavigationManager navManager
+@using Microsoft.AspNetCore.Authorization
+
+<PageTitle>Quiz</PageTitle>
+<Header />
+
+<h1>Quiz</h1>
+
+@code {
+    [Parameter] public int tutorialId { get; set; }
+}
