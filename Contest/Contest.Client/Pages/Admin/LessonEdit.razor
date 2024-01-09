@@ -1,6 +1,7 @@
 ﻿@page "/lessonedit/{tutorialID:int}/{lessonId:int}"
 
 @using Contest.Client.Services
+@using TinyMCE.Blazor
 @rendermode InteractiveAuto
 @inject NavigationManager navManager
 
@@ -18,22 +19,23 @@ else
     <div class="main">
         <EditForm Model="lesson" OnValidSubmit="OnValidSubmit">
             <div>Id: @lesson.LessonId</div>
-            <div>Tutorial Name: @tutorial.Title</div>
+            <div class="mb-2">Tutorial Name: @tutorial.Title</div>
             <div class="form-group">
-                <label>Lesson's Name</label>
-                <div>
+
+                <div class="mb-2">
+                    <label>Lesson Name</label>
                     <InputText class="form-control" @bind-Value="lesson.Title" />
                     <ValidationMessage For="@(() => lesson.Title)" />
                 </div>
-                <label>Lesson's order</label>
-                <div>
+
+                <div class="mb-2">
+                    <label>Lesson Order</label>
                     <InputNumber class="form-control" @bind-Value="lesson.Order" />
                     <ValidationMessage For="@(() => lesson.Order)" />
                 </div>
-                <div class="mb-3">
-                    <label for="exampleFormControlTextarea1" class="form-label">Lesson</label>
-                    <textarea class="form-control" @bind="lesson.Body" rows="8"></textarea>
-                    <ValidationMessage For="@(() => lesson.Body)" />
+                <div class="mb-2">
+                    <label>Lesson</label>
+                    <Editor Field="() => lesson.Body" @bind-Value=lesson.Body />
                 </div>
             </div>
 
@@ -48,6 +50,7 @@ else
                 <button type="button" class="btn btn-danger mr-auto" @onclick="Delete"><i class="bi bi-trash-fill"></i></button>
             }
         </EditForm>
+        
     </div>
 
     <br />
@@ -61,6 +64,7 @@ else
 }
 
 @code {
+
     [Parameter] public int lessonId { get; set; }
     [Parameter] public int tutorialId { get; set; }
     private Lesson? lesson = new Lesson();
