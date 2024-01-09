@@ -7,8 +7,10 @@ namespace Contest.Data
     public class ApplicationUser : IdentityUser
     {
         [Required]
+        [PersonalData]
         public string? FirstName { get; set; }
         [Required]
+        [PersonalData]
         public string? LastName { get; set; }
         public  string? AccountType { get; set; }
     }
