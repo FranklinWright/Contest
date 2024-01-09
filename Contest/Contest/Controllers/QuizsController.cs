@@ -23,9 +23,19 @@ namespace Contest.Controllers
 
         // GET: api/Quizs
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Quiz>>> GetQuiz()
+        public async Task<ActionResult<IEnumerable<Quiz>>> GetQuiz(
+            [FromQuery] int tutorialId,
+            [FromQuery] bool sorted
+            )
         {
-            return await _context.Quiz.ToListAsync();
+            IQueryable<Quiz> query = _context.Quiz;
+
+            if (tutorialId > 0)
+            {
+                query = query.Where(q => q.TutorialId == tutorialId).OrderBy(q => q.Order);
+            }
+
+            return Ok(await query.ToListAsync());
         }
 
         // GET: api/Quizs/5

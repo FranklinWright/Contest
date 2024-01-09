@@ -10,6 +10,85 @@
 
 <h1>Quiz</h1>
 
+@if (questions == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h2>@tutorial!.Title</h2>
+    @foreach (var item in questions)
+    {
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">@item.Topic</h5>
+                <p class="card-text">@item.Question</p>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="question_@item.QuizId" id="questionA_@item.QuizId" @onchange="@(() => OptionChanged(item.QuizId, @A))">
+                    <label class="form-check-label" for="questionA_@item.QuizId">
+                        @item.A
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="question_@item.QuizId" id="questionB_@item.QuizId" @onchange="@(() => OptionChanged(item.QuizId, @B))">
+                    <label class="form-check-label" for="questionB_@item.QuizId">
+                        @item.B
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="question_@item.QuizId" id="questionC_@item.QuizId" @onchange="@(() => OptionChanged(item.QuizId, @C))">
+                    <label class="form-check-label" for="questionC_@item.QuizId">
+                        @item.C
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="question_@item.QuizId" id="questionD_@item.QuizId" @onchange="@(() => OptionChanged(item.QuizId, @D))">
+                    <label class="form-check-label" for="questionD_@item.QuizId">
+                        @item.D
+                    </label>
+                </div>
+            </div>
+        </div>
+        <br />
+    }
+}
+
 @code {
     [Parameter] public int tutorialId { get; set; }
+    private TutorialResponse? tutorial;
+    private List<Quiz>? questions;
+    private List<QuizAnswer> answers;
+
+    private string A = "A";
+    private string B = "B";
+    private string C = "C";
+    private string D = "D";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var tutorialService = new TutorialService(navManager);
+        tutorial = await tutorialService.GetTutorialAsync(tutorialId);
+        var quizService = new QuizService(navManager);
+        questions = await quizService.GetQuizAsyncInOrder(tutorialId);
+
+        answers = new List<QuizAnswer>();
+        foreach (var item in questions)
+        {
+            answers.Add(new QuizAnswer() { QuizId = item.QuizId });
+        }
+    }
+    private void OptionChanged(int quizId, string answer)
+    {
+        var quizAnswer = answers.FirstOrDefault(a => a.QuizId == quizId);
+        if (quizAnswer != null)
+        {
+            quizAnswer.Answer = answer;
+        }
+    }
+
+    private class QuizAnswer()
+    {
+       public int QuizId { get; set; }
+       public string Answer { get; set; }
+    }
 }

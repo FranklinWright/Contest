@@ -62,6 +62,23 @@ else
 
     private async void Next()
     {
+        UpdateProgress();
+        navManager.NavigateTo("/student/tutorial/" + tutorialId + "/" + (lessonPlace + 1));
+    }
+
+    private async void Back()
+    {
+        navManager.NavigateTo("/student/tutorial/" + tutorialId + "/" + (lessonPlace - 1));
+    }
+
+    private async void Quiz()
+    {
+        UpdateProgress();
+        navManager.NavigateTo("/student/quiz/" + tutorialId);
+    }
+
+    private async void UpdateProgress()
+    {
         var studentService = new StudentTutorialService(navManager);
         var studentsProgress = await studentService.GetStudentTutorialByTutorialIdAsync(tutorialId);
         var progress = studentsProgress.FirstOrDefault();
@@ -71,21 +88,5 @@ else
             progress!.CompletedLessons = lessonPlace;
             var success = await studentService.UpdateStudentTutorialAsync(progress!);
         }
-
-        navManager.NavigateTo("/student/tutorial/" + tutorialId + "/" + (lessonPlace + 1));
-
     }
-
-    private async void Back()
-    {
-        navManager.NavigateTo("/student/tutorial/" + tutorialId + "/" + (lessonPlace - 1));
-
-    }
-
-    private async void Quiz()
-    {
-        navManager.NavigateTo("/student/quiz/" + tutorialId);
-
-    }
-
 }
