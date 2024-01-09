@@ -1,16 +1,15 @@
 ﻿@page "/student/classlisting"
 
 @using Contest.Client.Services
-@rendermode InteractiveWebAssembly
+@rendermode InteractiveAuto
 @inject NavigationManager navManager
 
-
-<PageTitle>Class Listing</PageTitle>
-<header />
+<PageTitle>Classes</PageTitle>
+<Header />
 
 <h1>
     Classes
-    <a href="classadd"><button class="btn btn-success"><i class="bi bi-plus-circle"></i></button></a>
+    <a href="classadd"><button class="btn btn-success" title="Join a class"><i class="bi bi-plus-circle"></i></button></a>
 </h1>
 
 @if (!showClasses)
@@ -31,7 +30,7 @@ else
             @foreach (var item in classes)
             {
                 <div class="pb-2">
-                    <a class="btn btn-primary" href="/student/class/@item.ClassId"><i class="bi bi-eye"></i></a>
+                    <a class="btn btn-primary" href="/student/class/@item.ClassId" title="View @item.ClassName class"><i class="bi bi-eye"></i></a>
                     <span class="b-2 ps-1"> @item.ClassName</span>
                 </div>
             }

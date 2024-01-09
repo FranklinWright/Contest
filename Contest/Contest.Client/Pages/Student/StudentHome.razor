@@ -5,6 +5,12 @@
 @inject NavigationManager navManager
 
 <Header />
+
+<AuthorizeView>
+    <h1>
+        Welcome, @context.User.Claims.FirstOrDefault(c => c.Type == "FirstName")?.Value!
+    </h1>
+</AuthorizeView>
 <p>Tutorials R Us is a great tool for taking tutorials. Each tuturial includes multiple lessons followed by a quiz. </p>
 
 <ul>
