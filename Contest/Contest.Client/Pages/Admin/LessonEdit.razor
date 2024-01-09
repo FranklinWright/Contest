@@ -8,7 +8,14 @@
 <PageTitle>Account Types</PageTitle>
 <Header />
 
-<h3>Lesson Edit</h3>
+@if (lessonId == 0)
+{
+    <h1>Add Lesson</h1>
+}
+else
+{
+    <h1>Edit Lesson</h1>
+}
 
 @if (lesson == null || tutorial == null)
 {
@@ -19,7 +26,7 @@ else
     <div class="main">
         <EditForm Model="lesson" OnValidSubmit="OnValidSubmit">
             <div>Id: @lesson.LessonId</div>
-            <div class="mb-2">Tutorial Name: @tutorial.Title</div>
+            <div class="mb-2">Tutorial Name: <b>@tutorial.Title</b></div>
             <div class="form-group">
 
                 <div class="mb-2">
@@ -33,6 +40,7 @@ else
                     <InputNumber class="form-control" @bind-Value="lesson.Order" />
                     <ValidationMessage For="@(() => lesson.Order)" />
                 </div>
+
                 <div class="mb-2">
                     <label>Lesson</label>
                     <Editor Field="() => lesson.Body" @bind-Value=lesson.Body />
@@ -42,7 +50,7 @@ else
             <DataAnnotationsValidator />
 
             <br />
-            <button type="submit" class="btn btn-success mr-auto"><i class="bi bi-save"></i></button>
+            <button type="submit" class="btn btn-success mr-auto"><i class="bi bi-save"></i> Save</button>
             <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel"><i class="bi bi-x-square"></i></button>
             @if (lesson.LessonId > 0)
             {
@@ -50,10 +58,7 @@ else
                 <button type="button" class="btn btn-danger mr-auto" @onclick="Delete"><i class="bi bi-trash-fill"></i></button>
             }
         </EditForm>
-        
     </div>
-
-    <br />
     @if (ShowErrorMsg)
     {
         <div class="alert alert-danger" role="alert">

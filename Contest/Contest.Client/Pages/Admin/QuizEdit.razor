@@ -7,7 +7,14 @@
 <PageTitle>Account Types</PageTitle>
 <Header />
 
-<h3>Quiz Edit</h3>
+@if (quizId == 0)
+{
+    <h1>Add Quiz</h1>
+}
+else
+{
+    <h1>Quiz Edit</h1>
+}
 
 @if (quiz == null || tutorial == null)
 {

@@ -7,7 +7,14 @@
 <PageTitle>Tutorial Edit</PageTitle>
 <Header />
 
-<h3>Tutorial Edit</h3>
+@if (tutorialId == 0)
+{
+    <h1>Add Tutorial</h1>
+}
+else
+{
+    <h1>Edit Tutoria</h1>
+}
 
 @if (tutorial == null)
 {
@@ -17,42 +24,46 @@ else
 {
     <div class="main">
         <EditForm Model="tutorial" OnValidSubmit="OnValidSubmit">
-            <div>Id: @tutorial.TutorialId</div>
-            <div class="form-group">
+            <div class="mb-2">Id: @tutorial.TutorialId</div>
+            <div class="mb-2">
                 <label>Tutorial Name</label>
                 <div>
                     <InputText class="form-control" @bind-Value="tutorial.Title" />
                     <ValidationMessage For="@(() => tutorial.Title)" />
                 </div>
             </div>
-            <div class="mb-3">
-                <label for="tutorial.Description" class="form-label">Description</label>
+
+            <div class="mb-2">
+                <label for="tutorial.Description">Description</label>
                 <textarea class="form-control" @bind="tutorial.Description" rows="3"></textarea>
                 <ValidationMessage For="@(() => tutorial.Description)" />
             </div>
-            <div class="mb-3">
-                <label for="tutorial.Tags" class="form-label">Tags</label>
+
+            <div class="mb-2">
+                <label for="tutorial.Tags">Tags</label>
                 <InputText class="form-control" @bind-Value="tutorial.Tags" />
                 <ValidationMessage For="@(() => tutorial.Tags)" />
             </div>
-            <DataAnnotationsValidator />
-            <button type="submit" class="btn btn-success mr-auto"><i class="bi bi-save"></i></button>
-            <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel"><i class="bi bi-x-square"></i></button>
-            @if (tutorial.TutorialId > 0)
-            {
-                <span> | </span>
-                <button type="button" class="btn btn-danger mr-auto" @onclick="Delete"><i class="bi bi-trash-fill"></i></button>
-            }
+            <DataAnnotationsValidator />         
         </EditForm>
+
+        <br />
+        <button type="submit" class="btn btn-success mr-auto"><i class="bi bi-save" title="Save tutorial"></i> Save</button>
+        <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel" title="Cancel"><i class="bi bi-x-square"></i></button>
+        @if (tutorial.TutorialId > 0)
+        {
+            <span> | </span>
+            <button type="button" class="btn btn-danger mr-auto" @onclick="Delete" title="Delete tutorial"><i class="bi bi-trash-fill"></i></button>
+        }
 
         @if (tutorial.TutorialId > 0)
         {
            <hr />
 
-            <h3>
+            <h2>
                 Lessons
-                <a href="lessonedit/@tutorial.TutorialId/0"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
-            </h3>
+                <a href="lessonedit/@tutorial.TutorialId/0"><button class="btn btn-success" title="Add lesson"><i class="bi bi-plus-circle"></i></button></a>
+            </h2>
             @if (lesson == null || quiz == null)
             {
                 <p><em>Loading...</em></p>
@@ -65,37 +76,37 @@ else
                 }
                 else
                 {
-                    <p><em>Lessons Found: @lesson.Count </em></p>
+                    <p><em>Lessons found: @lesson.Count </em></p>
 
                     <ul>
                         @foreach (var lesson in lesson)
                         {
                             <div class="pb-2">
-                                <a class="btn btn-sm btn-primary" href="lessonedit/@tutorial.TutorialId/@lesson.LessonId"><i class="bi bi-pencil-fill"></i></a>
-                                <span class="b-2"> @lesson.Title</span>
+                                <a class="btn btn-primary" href="lessonedit/@tutorial.TutorialId/@lesson.LessonId" title="View lesson"><i class="bi bi-pencil-fill"></i></a>
+                                <span class="b-2 ps-1"> @lesson.Title</span>
                             </div>
                         }
                     </ul>
                 }
                 <hr />
-                <h3>
+                <h2>
                     Quiz Questions
-                    <a href="quizedit/@tutorial.TutorialId/0"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
-                </h3>
+                    <a href="quizedit/@tutorial.TutorialId/0"><button class="btn btn-success" title="Add quiz"><i class="bi bi-plus-circle"></i></button></a>
+                </h2>
                 @if (quiz.Count == 0)
                 {
                     <p><em>No Questions found.</em></p>
                 }
                 else
                 {
-                    <p><em>Questions Found:@quiz.Count</em></p>
+                    <p><em>Questions found: @quiz.Count</em></p>
 
                     <ul>
                         @foreach (var quiz in quiz)
                         {
                             <div class="pb-2">
-                                <a class="btn btn-sm btn-primary" href="quizedit/@tutorial.TutorialId/@quiz.QuizId"><i class="bi bi-trash-fill"></i></a>
-                                <span class="b-2"> @quiz.Topic</span>
+                                <a class="btn btn-sm btn-primary" href="quizedit/@tutorial.TutorialId/@quiz.QuizId" title="View quiz"><i class="bi bi-trash-fill"></i></a>
+                                <span class="b-2 ps-1"> @quiz.Topic</span>
                             </div>
                         }
                     </ul>
