@@ -7,9 +7,9 @@
 <PageTitle>Tutorials</PageTitle>
 <Header />
 
-<h3>
-    Tutorial Listing
-</h3>
+<h1>
+    Tutorials
+</h1>
 
 @if (!ShowTutorials)
 {
@@ -18,7 +18,7 @@
 else
 {
     <div class="mb-1 mt-2">
-        <input type="text" @bind="SearchString" placeholder="Search" /> <button class="btn btn-sm btn-primary" @onclick="Search"><i class="bi bi-search"></i></button>
+        <input type="text" @bind="SearchString" placeholder="Search" /> <button class="btn btn-primary" @onclick="Search"><i class="bi bi-search"></i></button>
     </div>
 
     @if (tutorials.Count == 0)
@@ -29,7 +29,10 @@ else
     {
         <p><em>Tutorials Found: @tutorials.Count</em></p>
 
-        <h4>Select Tutorials</h4>
+        <h4>
+            Select Tutorials to Add
+        </h4>
+        <div style="color:gray" class="pb-1">(Note: Only tutorials that are not already in the class are listed.)</div>
         <ul class="list-group">
             @foreach (var tutorial in tutorials)
             {
@@ -43,7 +46,7 @@ else
             }
         </ul>
         <br />
-        <button class="btn btn-primary" @onclick="SaveSelectedTutorials">Save</button>
+        <button class="btn btn-primary" @onclick="SaveSelectedTutorials" title="Add selected tutorials to class"><i class="bi bi-save"></i> Add Tutorials</button>
     }
 }
 

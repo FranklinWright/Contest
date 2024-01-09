@@ -4,8 +4,10 @@
 @rendermode InteractiveAuto
 @inject NavigationManager navManager
 
+<PageTitle>Students</PageTitle>
 <Header />
-<h3>Students By Class</h3>
+
+<h1>Students By Class</h1>
 
 @if (classes == null)
 {
@@ -15,7 +17,7 @@ else
 {
     @if (classes.Count == 0)
     {
-        <p><em>No Classes found.</em></p>
+        <p><em>No classes found.</em></p>
     }
     else
     {
@@ -32,7 +34,7 @@ else
 
 @if (ShowStudents){
     <br />
-    <h3>Students</h3>
+    <h2>Students</h2>
     @if (students == null)
     {
         <p><em>Loading...</em></p>

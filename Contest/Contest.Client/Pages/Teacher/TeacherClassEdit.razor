@@ -8,7 +8,14 @@
 <PageTitle>Class Edit</PageTitle>
 <Header />
 
-<h3>Class Edit </h3>
+@if (classId == 0)
+{
+    <h1>Add Class</h1>
+}
+else
+{
+    <h1>Edit Class</h1>
+}
 
 @if (classes == null)
 {
@@ -18,8 +25,9 @@ else
 {
     <div class="main">
         <EditForm Model="classes" OnValidSubmit="OnValidSubmit">
-            <div>Id: @classes.ClassId</div>
-            <div class="form-group">
+            <div class="mb-2">Id: @classes.ClassId</div>
+
+            <div class="mb-2">
                 <label>Class Name</label>
                 <div>
                     <InputText class="form-control" @bind-Value="classes.ClassName" />
@@ -27,7 +35,7 @@ else
                 </div>
             </div>
 
-            <div class="form-group">
+            <div class="mb-2">
                 <label>Class Code</label>
                 <div>
                     <InputText class="form-control" @bind-Value="classes.ClassCode" />
@@ -35,17 +43,16 @@ else
                 </div>
             </div>
 
-            <DataAnnotationsValidator />
-
-            <br />
-            <button type="submit" class="btn btn-primary mr-auto" title="Save"><i class="bi bi-save"></i></button>
-            <button type="button" class="btn btn-secondary mr-auto" title="Cancel" @onclick="EditCancel"><i class="bi bi-x-square"></i></button>
-            @if (classes.ClassId > 0)
-            {
-                <span> | </span>
-                <button type="button" class="btn btn-danger mr-auto" title="Delete" @onclick="Delete"><i class="bi bi-trash-fill"></i></button>
-            }
+            <DataAnnotationsValidator />   
         </EditForm>
+
+        <button type="submit" class="btn btn-primary mr-auto" title="Save"><i class="bi bi-save"></i> Save</button>
+        <button type="button" class="btn btn-secondary mr-auto" title="Cancel" @onclick="EditCancel"><i class="bi bi-x-square"></i></button>
+        @if (classes.ClassId > 0)
+        {
+            <span> | </span>
+            <button type="button" class="btn btn-danger mr-auto" title="Delete" @onclick="Delete"><i class="bi bi-trash-fill"></i></button>
+        }
     </div>
 
     <br />

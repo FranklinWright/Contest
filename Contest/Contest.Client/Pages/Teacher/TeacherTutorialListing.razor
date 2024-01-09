@@ -5,8 +5,9 @@
 @rendermode InteractiveAuto
 @inject NavigationManager navManager
 
+<PageTitle>Tutorials by Class</PageTitle>
 <Header />
-<h3>Tutorials By Class</h3>
+<h1>Tutorials By Class</h1>
 
 @if (classes == null)
 {
@@ -16,7 +17,7 @@ else
 {
     @if (classes.Count == 0)
     {
-        <p><em>No Classes found.</em></p>
+        <p><em>No classes found.</em></p>
     }
     else
     {
@@ -39,9 +40,9 @@ else
 @if (ShowTutorials)
 {
     <br />
-    <h3>Tutorials
-        <a href="teacher/tutorial-add/@classId"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
-    </h3>
+    <h2>Tutorials
+        <a href="teacher/tutorial-add/@classId"><button class="btn btn-success" title="Add tutorial"><i class="bi bi-plus-circle"></i></button></a>
+    </h2>
     @if (tutorials == null)
     {
         <p><em>Loading...</em></p>
@@ -50,21 +51,21 @@ else
     {
         @if (tutorials.Count == 0)
         {
-            <p><em>No Tutorials found.</em></p>
+            <p><em>No tutorials found.</em></p>
         }
         else
         {
-            <p><em>Tutorials Found: @tutorials.Count</em></p>
+            <p><em>Tutorials found: @tutorials.Count</em></p>
            
             <ul class="list-group">
                 @foreach (var tutorial in tutorials)
                 {
                     <li class="list-group-item">
-                        <button type="button" class="btn btn-danger align-top" @onclick="() => DeleteTutorial(tutorial.ClassTutorialId)" title="Delete"><i class="bi bi-trash-fill"></i></button>
+                        <button type="button" class="btn btn-danger" @onclick="() => DeleteTutorial(tutorial.ClassTutorialId)" title="Delete"><i class="bi bi-trash-fill"></i></button>
                         <label class="form-check-label ps-2" for="@tutorial.TutorialId">
-                            <b>@tutorial.Tutorial.Title</b>
-                            <div>@tutorial.Tutorial.Description</div>
+                            <b>@tutorial.Tutorial.Title</b>                           
                         </label>
+                        <div class="pt-2">@tutorial.Tutorial.Description</div>
                     </li>
                 }
             </ul>
