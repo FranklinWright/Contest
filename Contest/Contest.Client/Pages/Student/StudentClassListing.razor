@@ -1,19 +1,19 @@
 ﻿@page "/student/classlisting"
 
 @using Contest.Client.Services
-@rendermode InteractiveAuto
+@rendermode InteractiveWebAssembly
 @inject NavigationManager navManager
 
 
 <PageTitle>Class Listing</PageTitle>
 <header />
 
-<h3>
-    Class Listing
-    <a href="classadd"><button class="btn btn-sm btn-success"><i class="bi bi-plus-circle"></i></button></a>
-</h3>
+<h1>
+    Classes
+    <a href="classadd"><button class="btn btn-success"><i class="bi bi-plus-circle"></i></button></a>
+</h1>
 
-@if (classes == null)
+@if (!showClasses)
 {
     <p><em>Loading...</em></p>
 }
@@ -21,18 +21,18 @@ else
 {
     @if (classes.Count == 0)
     {
-        <p><em>No Classes found.</em></p>
+        <p><em>No classes found.</em></p>
     }
     else
     {
-        <p><em>You have @classes.Count classes.</em></p>
+        <p><em>You have joined @classes.Count classes.</em></p>
 
         <ul>
             @foreach (var item in classes)
             {
                 <div class="pb-2">
-                    <a class="btn btn-sm btn-primary" href="/student/class/@item.ClassId"><i class="bi bi-eye"></i></a>
-                    <span class="b-2"> @item.ClassName</span>
+                    <a class="btn btn-primary" href="/student/class/@item.ClassId"><i class="bi bi-eye"></i></a>
+                    <span class="b-2 ps-1"> @item.ClassName</span>
                 </div>
             }
         </ul>
@@ -40,11 +40,20 @@ else
 }
 
 @code {
+    private bool showClasses = false;
     private List<ClassUserResponse>? classes;
 
     protected override async Task OnInitializedAsync()
     {
         var service = new ClassUserService(navManager);
         classes = await service.GetClassUserAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            showClasses = true;
+        }
     }
 }
