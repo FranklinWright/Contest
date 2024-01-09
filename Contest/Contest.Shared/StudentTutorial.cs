@@ -12,6 +12,6 @@ namespace Contest.Shared
         public Guid UserId { get; set; }
         public int TutorialId { get; set; }
         public int CompletedLessons { get; set; }
-        public int QuizScore { get; set; }
+        public int? QuizScore { get; set; }
     }
 }

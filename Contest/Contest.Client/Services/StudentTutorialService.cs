@@ -22,6 +22,17 @@ namespace Contest.Client.Services
             return StudentTutorials;
         }
 
+        public async Task<List<StudentTutorial>?> GetStudentTutorialByTutorialIdAsync(int tutorialId)
+        {
+            var url = new UriBuilder(_navigationManager.BaseUri)
+            {
+                Path = "api/StudentTutorials",
+                Query = $"tutorialId={tutorialId}"
+            }.ToString();
+            var result = await _httpClient.GetFromJsonAsync<List<StudentTutorial>>(url);
+            return result;
+        }
+
         public async Task<StudentTutorial?> GetStudentTutorialAsync(int studentTutorialId)
         {
             string endpoint = $"api/StudentTutorials/{studentTutorialId}";

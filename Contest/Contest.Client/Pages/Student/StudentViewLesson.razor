@@ -5,6 +5,7 @@
 @inject NavigationManager navManager
 @using Microsoft.AspNetCore.Authorization
 
+<PageTitle>Lessons</PageTitle>
 <Header />
 
 @if(lesson == null)
@@ -43,13 +44,13 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-
+        lessonPlace = lessonPlace - 1;
         var service = new LessonService(navManager);
         lesson = await service.GetLessonAsyncInOrder(tutorialId);
         var service2 = new TutorialService(navManager);
         tutorial = await service2.GetTutorialAsync(tutorialId);
         var service3 = new StudentTutorialService(navManager);
-        students = await service3.GetStudentTutorialAsync();
+       // students = await service3.GetStudentTutorialAsync();
         bool check = true;
         if(students != null)
         {

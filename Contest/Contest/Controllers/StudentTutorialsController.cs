@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Contest.Data;
 using Contest.Shared;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Contest.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class StudentTutorialsController : MyController
@@ -23,10 +25,14 @@ namespace Contest.Controllers
 
         // GET: api/StudentTutorials
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<StudentTutorial>>> GetStudentTutorial()
+        public async Task<ActionResult<List<StudentTutorial>>> GetStudentTutorial(
+            [FromQuery] int classId,
+            [FromQuery] int tutorialId
+            )
         {
             var userId = GetUserId();
-            return await _context.StudentTutorial.Where(c => c.UserId == userId).ToListAsync();
+            var studentTutorials = await _context.StudentTutorial.Where(c => c.UserId == userId && c.TutorialId == tutorialId).ToListAsync();
+            return studentTutorials;
         }
 
         // GET: api/StudentTutorials/5

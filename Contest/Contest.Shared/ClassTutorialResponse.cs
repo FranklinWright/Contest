@@ -11,6 +11,7 @@ namespace Contest.Shared
         public int ClassTutorialId { get; set; }
         public int ClassId { get; set; }
         public int TutorialId { get; set; }
+        public int LessonCount { get; set; }
 
         public Class? Class { get; set; }
         public Tutorial? Tutorial { get; set; }

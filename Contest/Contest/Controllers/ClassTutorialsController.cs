@@ -36,6 +36,7 @@ namespace Contest.Controllers
                             ClassTutorialId = ct.ClassTutorialId,
                             ClassId = ct.ClassId,
                             TutorialId = ct.TutorialId,
+                            LessonCount = _context.Lesson.Where(l => l.TutorialId == t.TutorialId).Count(),
                             Tutorial = t
                         };
 

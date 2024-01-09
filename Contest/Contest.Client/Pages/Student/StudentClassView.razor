@@ -3,28 +3,28 @@
 @using Contest.Client.Services
 @rendermode InteractiveAuto
 @inject NavigationManager navManager
-@using Microsoft.AspNetCore.Authorization
 
+<PageTitle>Class</PageTitle>
+<Header />
 
- <nav>
+<nav>
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="student/classlisting">Classes</a></li>
         <li class="breadcrumb-item active">Class</li>
     </ol>
 </nav>
 
-@if (classes == null || tutorials == null || studentTutorials == null)
+@if (!ShowData)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <h1>@classes.ClassName Class</h1>
-    <br />
-    
-    @if (tutorials.Count == 0)
+    <h1>@curClass.ClassName</h1>
+
+    @if (classTutorials.Count == 0)
     {
-        <p><em>No Tutorials found.</em></p>
+        <p><em>No tutorials found.</em></p>
     }
     else
     {
@@ -35,109 +35,112 @@ else
                     <th>Tutorial Name</th>
                     <th>Percentage Done</th>
                     <th>Quiz Grade</th>
-                    <th>Actions</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var tutorial in tutorials)
+                @foreach (var progress in studentProgresses)
                 {
-                    var matchingStudentTutorial = studentTutorials.FirstOrDefault(st => st.TutorialId == tutorial.TutorialId);
-                    if (matchingStudentTutorial != null)
-                    {
-                        int precent = ((matchingStudentTutorial.CompletedLessons +1) * 100 / (tutorial.LessonCount+1));
-                        <tr>
-
-                            <td>@tutorial.Title</td>
-                            <td>
-                                <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                    <div class="progress-bar" style="width: @precent%"></div>
-                                </div>
-                                @precent%
-                                </td>
-                            <td>@matchingStudentTutorial.QuizScore%</td>
-                            <td><a class="btn btn-sm btn-primary" href="/student/tutorial/@tutorial.TutorialId/@matchingStudentTutorial.CompletedLessons"><i class="bi bi-eye" title="Start Tutorial"></i></a></td>
-                        </tr>
-                    }
-                    else
-                    {
-                        <tr>
-                    <td>@tutorial.Title</td>
-                    <td>0%</td>
-                    <td>0%</td>
-                    <td><a class="btn btn-sm btn-primary" href="/student/tutorial/@tutorial.TutorialId/0"><i class="bi bi-eye"></i></a></td>
+                    <tr>
+                        <td>@progress.Title</td>
+                        <td>
+                            <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar" style="width: @progress.PercentageDone%"></div>
+                            </div>
+                            @progress.PercentageDone%
+                        </td>
+                        <td>@progress.QuizGrade</td>
+                        <td>
+                            @if (progress.QuizGrade == null)
+                            {
+                                <a class="btn btn-success" href="/student/tutorial/@progress.TutorialId/@progress.NextLesson" title="Start @progress.Title">View Tutorial</a>
+                            }
+                        </td>
                     </tr>
-                    }
                 }
             </tbody>
         </table>
-
-
-
-
-         
-
-
-       
     }
-    
-
-
-
 }
 
 @code {
     [Parameter] public int classId { get; set; }
-
-    private Class? classes = new Class();
-    private List<TutorialResponse>? tutorials;
+    private bool ShowData = false;
+    private Class? curClass;
+    private List<ClassTutorialResponse>? classTutorials;
     protected bool ShowErrorMsg = false;
     protected Dictionary<string, string> ErrorMessages = new Dictionary<string, string>();
 
     private List<StudentTutorial>? studentTutorials;
-    private List<TutorialResponse>? tutorialStuff;
+    private List<StudentProgress> studentProgresses = new List<StudentProgress>();
 
     protected override async Task OnParametersSetAsync()
     {
-        if (classId > 0)
+        try
         {
-            try
+            // Get the class.
+            var classService = new ClassService(navManager);
+            curClass = await classService.GetClassAsync(classId);
+
+            // Get the tutorials for the class.
+            var classTutorialService = new ClassTutorialService(navManager);
+            classTutorials = await classTutorialService.GetClassTutorialsByClassIdAsync(classId);
+
+            if (classTutorials != null)
             {
-                var service = new ClassService(navManager);
-                classes = await service.GetClassAsync(classId);
-
-                var classTutorialService = new ClassTutorialService(navManager);
-                var tutorialsClass = await classTutorialService.GetClassTutorialsByClassIdAsync(classId);
-                tutorials = new List<TutorialResponse>();
-
-                var service4 = new TutorialService(navManager);
-                tutorialStuff = await service4.GetTutorialAsync();
-                if(tutorialsClass != null && tutorialStuff != null)
-                {
-                    foreach (ClassTutorialResponse tutorial in tutorialsClass)
-                    {
-                        foreach(TutorialResponse tutorialResponse in tutorialStuff)
-                        {
-                            if (tutorial.TutorialId.Equals(tutorialResponse.TutorialId))
-                            {
-                                tutorials.Add(tutorialResponse);
-                            }
-                        }
-                    }
-                }
-
+                // Get the student tutorials for each of the tutorials.
                 var studentTutorialService = new StudentTutorialService(navManager);
-                studentTutorials = await studentTutorialService.GetStudentTutorialAsync();
+                List<StudentTutorial>? studentTutorials = new List<StudentTutorial>();
+                foreach (var tutorial in classTutorials)
+                {
+                    studentTutorials = await studentTutorialService.GetStudentTutorialByTutorialIdAsync(tutorial.TutorialId);
+                    if (studentTutorials == null)
+                    {
+                        // Add the missing StudentTutorial.
+                        var newStudentTutorial = new StudentTutorial { TutorialId = tutorial.TutorialId };
+                        await studentTutorialService.CreateStudentTutorialAsync(newStudentTutorial);
 
-                
+                        // Get the newly created StudentTutorial.
+                        studentTutorials = await studentTutorialService.GetStudentTutorialByTutorialIdAsync(tutorial.TutorialId);
+                    };
 
+                    var progress = studentTutorials.FirstOrDefault();
 
+                    int nextLesson = progress.CompletedLessons + 1;
+                    if (nextLesson > tutorial.LessonCount)
+                    {
+                        nextLesson = tutorial.LessonCount;
+                    }
+
+                    var newStudentProgress = new StudentProgress
+                        {
+                            TutorialId = tutorial.TutorialId,
+                            Title = tutorial.Tutorial!.Title!,
+                            NextLesson = nextLesson,
+                            PercentageDone = ((progress!.CompletedLessons * 100) / tutorial.LessonCount),
+                            QuizGrade = progress.QuizScore
+                        };
+                    studentProgresses.Add(newStudentProgress);
+                }
             }
-            catch (Exception ex)
-            {
-                ErrorMessages["Message"] = ex.Message;
-                ShowErrorMsg = true;
-            }
-        }
+
+
+        ShowData = true;
     }
+    catch (Exception ex)
+    {
+        ErrorMessages["Message"] = ex.Message;
+        ShowErrorMsg = true;
+    }
+}
 
+    public class StudentProgress
+    {
+        public int TutorialId { get; set; }
+        public string? Title { get; set; }
+        public int NextLesson { get; set; }
+        public int PercentageDone { get; set; }
+        public int? QuizGrade { get; set; }
+        public string? Action { get; set; }
+    }
 }
