@@ -51,6 +51,15 @@ else
         </div>
         <br />
     }
+
+    <button type="submit" class="btn btn-primary mr-auto" @onclick="ScoreQuiz">Score Quiz</button>
+
+    @if (showScore)
+    {
+        <br /><br />
+        <div class="alert alert-success">Quiz Score: @quizScore%</div>
+    }
+
 }
 
 @code {
@@ -58,6 +67,8 @@ else
     private TutorialResponse? tutorial;
     private List<Quiz>? questions;
     private List<QuizAnswer> answers;
+    private bool showScore = false;
+    private int quizScore;
 
     private string A = "A";
     private string B = "B";
@@ -88,7 +99,35 @@ else
 
     private class QuizAnswer()
     {
-       public int QuizId { get; set; }
-       public string Answer { get; set; }
+        public int QuizId { get; set; }
+        public string Answer { get; set; }
+    }
+
+    private async Task ScoreQuiz()
+    {
+        var totalQuestions = questions!.Count;
+        var correctAnswers = 0;
+
+        foreach (var item in questions)
+        {
+            string correct = item.Answer;
+            string guess = answers.FirstOrDefault(a => a.QuizId == item.QuizId).Answer;
+            if (correct == guess){ correctAnswers++; };
+        }
+
+        quizScore = (correctAnswers * 100) / totalQuestions;
+        await UpdateQuizScore();
+
+        showScore = true;
+    }
+
+    private async Task UpdateQuizScore()
+    {
+        var studentService = new StudentTutorialService(navManager);
+        var studentsProgress = await studentService.GetStudentTutorialByTutorialIdAsync(tutorialId);
+        var progress = studentsProgress.FirstOrDefault();
+
+        progress!.QuizScore = quizScore;
+            var success = await studentService.UpdateStudentTutorialAsync(progress!);
     }
 }

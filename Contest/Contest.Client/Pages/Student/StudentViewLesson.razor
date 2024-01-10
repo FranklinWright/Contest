@@ -18,7 +18,7 @@ else
     <h1>@lesson[lessonPlace-1].Title</h1>
     @((MarkupString)lesson[lessonPlace-1].Body)
     <hr />
-    @if(lessonPlace > 0)
+    @if(lessonPlace > 1)
     {
         <button type="button" class="btn btn-danger mr-auto" @onclick="Back" title="Previous Page"><i class="bi bi-arrow-left"></i> Previous</button>
     }
@@ -43,7 +43,6 @@ else
         <br />
         <button type="button" class="btn btn-primary mr-auto" @onclick="Quiz" title="Start Quiz"><i class="bi bi-clipboard-x"></i> Start Quiz</button>
     }
-
 }
 
 @code {
