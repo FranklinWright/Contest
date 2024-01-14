@@ -54,7 +54,9 @@ else
                 {
                     <li>
                         <span class="b-2"> @item</span>
+
                     </li>
+                    <span> @studentProgresses[item][0].PercentageDone </span>
                 }
             </ul>
         }
@@ -72,6 +74,9 @@ else
         classes = await service.GetClassAsync();
     }
 
+    private List<Student>? studentsList;
+    private Dictionary<string, List<StudentProgress>> studentProgresses = new Dictionary<string, List<StudentProgress>>();
+
     protected async Task SelectClass(ChangeEventArgs e)
     {
         if (e.Value.ToString() == "0")
@@ -86,10 +91,29 @@ else
         List<ClassUserResponse> result;
         var service = new ClassUserService(navManager);
         result = await service.GetClassUserByClassIdAsync(int.Parse(e.Value.ToString()));
+       
         foreach (var item in result[0].Students)
         {
             string fullName = $"{item.LastName}, {item.FirstName}";
             students.Add(fullName);
+            
         }
+        }
+
+       
+        
+        
+        
+    public class StudentProgress
+    {
+        public int TutorialId { get; set; }
+        public string? Title { get; set; }
+        public int LessonCount { get; set; }
+        public int NextLesson { get; set; }
+        public int PercentageDone { get; set; }
+        public int? QuizGrade { get; set; }
+        public string? Action { get; set; }
     }
+    
+   
 }

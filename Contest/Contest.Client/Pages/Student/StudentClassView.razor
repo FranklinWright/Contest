@@ -51,11 +51,24 @@ else
                             </div>
                             @progress.PercentageDone%
                         </td>
-                        <td>@progress.QuizGrade</td>
+                        <td>
+                            @if (progress.QuizGrade == null)
+                            {
+                                
+                            }
+                            else
+                            {
+                                <span>@progress.QuizGrade%</span>
+                            }
+                        </td>
                         <td>
                             @if (progress.QuizGrade == null)
                             {
                                 <a class="btn btn-success" href="/student/tutorial/@progress.TutorialId/@progress.NextLesson" title="Start @progress.Title">View Tutorial</a>
+                            }
+                            else
+                            {
+                                <a class="btn btn-success" href="/student/tutorial/@progress.TutorialId/1" title="Start @progress.Title">View Tutorial</a>
                             }
                         </td>
                     </tr>
