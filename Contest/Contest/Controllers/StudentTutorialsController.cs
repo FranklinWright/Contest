@@ -26,13 +26,22 @@ namespace Contest.Controllers
         // GET: api/StudentTutorials
         [HttpGet]
         public async Task<ActionResult<List<StudentTutorial>>> GetStudentTutorial(
-            [FromQuery] int classId,
+            [FromQuery] Guid studentId,
             [FromQuery] int tutorialId
             )
         {
-            var userId = GetUserId();
-            var studentTutorials = await _context.StudentTutorial.Where(c => c.UserId == userId && c.TutorialId == tutorialId).ToListAsync();
-            return studentTutorials;
+            // Get all of the tutorials for the current user
+            if (tutorialId != 0)
+            {
+                var userId = GetUserId();
+                var studentTutorials = await _context.StudentTutorial.Where(c => c.UserId == userId && c.TutorialId == tutorialId).ToListAsync();
+                return studentTutorials;
+            }
+            else
+            {
+                var studentTutorials = await _context.StudentTutorial.Where(c => c.UserId == studentId && c.TutorialId == tutorialId).ToListAsync();
+                return studentTutorials;
+            }
         }
 
         // GET: api/StudentTutorials/5
