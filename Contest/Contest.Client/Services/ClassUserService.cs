@@ -15,13 +15,17 @@ namespace Contest.Client.Services
             _navigationManager = navigationManager;
             _httpClient.BaseAddress = new Uri(_navigationManager.BaseUri);
         }
-
+        //get all class users
         public async Task<List<ClassUserResponse>?> GetClassUserAsync()
         {
             var result = await _httpClient.GetFromJsonAsync<List<ClassUserResponse>>("api/ClassUsers");
             return result;
         }
-
+        /// <summary>
+        /// get class user by class id
+        /// </summary>
+        /// <param name="classId"></param>
+        /// <returns></returns>
         public async Task<List<ClassUserResponse>?> GetClassUserByClassIdAsync(int classId)
         {
             var url = new UriBuilder(_navigationManager.BaseUri)
@@ -32,20 +36,32 @@ namespace Contest.Client.Services
             var result = await _httpClient.GetFromJsonAsync<List<ClassUserResponse>>(url);
             return result;
         }
-
+        /// <summary>
+        /// get class user by class id
+        /// </summary>
+        /// <param name="classUserId"></param>
+        /// <returns></returns>
         public async Task<ClassUser?> GetClassUserAsync(int classUserId)
         {
             string endpoint = $"api/ClassUsers/{classUserId}";
             var classUser = await _httpClient.GetFromJsonAsync<ClassUser>(endpoint);
             return classUser;
         }
-
+        /// <summary>
+        /// Create class user
+        /// </summary>
+        /// <param name="classUser"></param>
+        /// <returns></returns>
         public async Task<bool> CreateClassUserAsync(ClassUser classUser)
         {
             var response = await _httpClient.PostAsJsonAsync("api/ClassUsers", classUser);
             return response.IsSuccessStatusCode;
         }
-
+        /// <summary>
+        /// updates class user
+        /// </summary>
+        /// <param name="classUser"></param>
+        /// <returns></returns>
         public async Task<bool> UpdateClassUserAsync(Class classUser)
         {
             string endpoint = $"api/ClassUsers/{classUser.ClassId}";

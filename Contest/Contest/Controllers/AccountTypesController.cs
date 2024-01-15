@@ -15,6 +15,7 @@ namespace Contest.Controllers
     public class AccountTypesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+      
 
         public AccountTypesController(ApplicationDbContext context)
         {
