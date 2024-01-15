@@ -13,7 +13,7 @@
 }
 else
 {
-    <h1>Edit Tutoria</h1>
+    <h1>Edit Tutorial</h1>
 }
 
 @if (tutorial == null)
@@ -45,17 +45,18 @@ else
                 <ValidationMessage For="@(() => tutorial.Tags)" />
             </div>
             <DataAnnotationsValidator />         
-        </EditForm>
+        
 
         <br />
         <button type="submit" class="btn btn-success mr-auto"><i class="bi bi-save" title="Save tutorial"></i> Save</button>
+        
         <button type="button" class="btn btn-secondary mr-auto" @onclick="EditCancel" title="Cancel"><i class="bi bi-x-square"></i></button>
         @if (tutorial.TutorialId > 0)
         {
             <span> | </span>
             <button type="button" class="btn btn-danger mr-auto" @onclick="Delete" title="Delete tutorial"><i class="bi bi-trash-fill"></i></button>
         }
-
+        </EditForm>
         @if (tutorial.TutorialId > 0)
         {
            <hr />
@@ -105,7 +106,7 @@ else
                         @foreach (var quiz in quiz)
                         {
                             <div class="pb-2">
-                                <a class="btn btn-sm btn-primary" href="quizedit/@tutorial.TutorialId/@quiz.QuizId"><i class="bi bi-trash-fill"></i></a>
+                                <a class="btn btn-sm btn-primary" href="quizedit/@tutorial.TutorialId/@quiz.QuizId"><i class="bi bi-pencil-fill"></i></a>
                                 <span class="b-2"> @quiz.Topic</span>
                             </div>
                         }
@@ -205,6 +206,11 @@ else
         var service = new TutorialService(navManager);
         await service.DeleteTutorialAsync(tutorial!.TutorialId);
         navManager.NavigateTo("tutoriallisting");
+    }
+
+    private async void Save()
+    {
+        
     }
 
     private List<Lesson>? lesson;

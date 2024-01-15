@@ -44,8 +44,7 @@ else
             </div>
 
             <DataAnnotationsValidator />   
-        </EditForm>
-
+       
         <button type="submit" class="btn btn-primary mr-auto" title="Save"><i class="bi bi-save"></i> Save</button>
         <button type="button" class="btn btn-secondary mr-auto" title="Cancel" @onclick="EditCancel"><i class="bi bi-x-square"></i></button>
         @if (classes.ClassId > 0)
@@ -53,6 +52,8 @@ else
             <span> | </span>
             <button type="button" class="btn btn-danger mr-auto" title="Delete" @onclick="Delete"><i class="bi bi-trash-fill"></i></button>
         }
+
+        </EditForm>
     </div>
 
     <br />
