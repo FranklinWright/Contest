@@ -32,7 +32,8 @@ else
     }
 }
 
-@if (ShowStudents){
+@if (ShowStudents)
+{
     <br />
     <h2>Students</h2>
     @if (students == null)
@@ -47,18 +48,47 @@ else
         }
         else
         {
-            <p><em>Students found: @students.Count</em></p>
+            <p><em>Students found: @studentProgresses.Count</em></p>
 
-            <ul>
-                @foreach (var item in students)
+            @foreach (var item in studentProgresses)
+            {
+                <h3><span class="b-2"> @item.Key</span></h3>
+                <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Percent Done</th>
+                                <th>Quiz Score</th>
+                            </tr>
+                        </thead>
+                         <tbody>
+
+                @foreach (var pro in item.Value.ToList())
                 {
-                    <li>
-                        <span class="b-2"> @item</span>
+                    <tr>
+                <td>@pro.Title</td>
+                <td>
+                    <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                        <div class="progress-bar" style="width: @pro.PercentageDone%"></div>
+                                    </div>
+                    @pro.PercentageDone%</td>
+                                <td>
+                                    @if (pro.QuizGrade == null)
+                                    {
 
-                    </li>
-                    <span> @studentProgresses[item][0].PercentageDone </span>
+                                    }
+                                    else
+                                    {
+                                        <span>@pro.QuizGrade%</span>
+                                    }
+                                </td>
+                </tr>
                 }
-            </ul>
+                        </tbody>
+                    </table>
+                
+            }
+           
         }
     }
 }
@@ -66,7 +96,11 @@ else
 @code {
     private List<Class>? classes;
     private bool ShowStudents = false;
-    private List<string>? students;
+    private List<ClassUserResponse>? classesUsers;
+    private List<ClassTutorialResponse>? classTutorials;
+    private int classId = 0;
+    private List<Student> students;
+    private Dictionary<string, List<StudentProgress>> studentProgresses = new Dictionary<string, List<StudentProgress>>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -74,36 +108,88 @@ else
         classes = await service.GetClassAsync();
     }
 
-    private List<Student>? studentsList;
-    private Dictionary<string, List<StudentProgress>> studentProgresses = new Dictionary<string, List<StudentProgress>>();
-
     protected async Task SelectClass(ChangeEventArgs e)
     {
-        if (e.Value.ToString() == "0")
+        classId = int.Parse(e.Value.ToString());
+        if (classId == 0)
         {
             ShowStudents = false;
             return;
         }
 
-        students = new List<string>();
-        ShowStudents = true;
+        // Get the tutorials in the class
+        var classTutorialService = new ClassTutorialService(navManager);
+        classTutorials = await classTutorialService.GetClassTutorialsByClassIdAsync(classId);
 
-        List<ClassUserResponse> result;
-        var service = new ClassUserService(navManager);
-        result = await service.GetClassUserByClassIdAsync(int.Parse(e.Value.ToString()));
-       
-        foreach (var item in result[0].Students)
+        // Get the students in the class
+        var classUserService = new ClassUserService(navManager);
+        classesUsers = await classUserService.GetClassUserByClassIdAsync(classId);
+
+        if (classesUsers == null)
         {
-            string fullName = $"{item.LastName}, {item.FirstName}";
-            students.Add(fullName);
-            
-        }
-        }
+            return;
+        };
+        students = classesUsers[0].Students;
 
-       
-        
-        
-        
+        foreach (var student in students)
+        {
+            var studentName = student.FirstName;
+
+            var studentTutorialService = new StudentTutorialService(navManager);
+            var studentTutorials = await studentTutorialService.GetStudentTutorialByStudentIdAsync(student.UserId);
+
+            var progresses = new List<StudentProgress>();
+            foreach (var studentTutorial in studentTutorials)
+            {
+                var curTutorial = classTutorials.Where(q => q.TutorialId == studentTutorial.TutorialId).FirstOrDefault();
+                if (curTutorial == null) { continue; };
+                int nextLesson = studentTutorial.CompletedLessons + 1;
+                if (nextLesson > curTutorial.LessonCount)
+                {
+                    nextLesson = curTutorial.LessonCount;
+                }
+
+                var newStudentProgress = new StudentProgress
+                    {
+                        TutorialId = curTutorial.TutorialId,
+                        Title = curTutorial.Tutorial!.Title!,
+                        LessonCount = curTutorial.LessonCount,
+                        NextLesson = nextLesson,
+                        PercentageDone = ((studentTutorial!.CompletedLessons * 100) / curTutorial.LessonCount),
+                        QuizGrade = studentTutorial.QuizScore
+                    };
+
+                progresses.Add(newStudentProgress);
+            }
+
+            // Add the unstarted tutorials
+            foreach (var assigned in classTutorials)
+            {
+                var started = progresses.Where(q => q.TutorialId == assigned.TutorialId).FirstOrDefault();
+                if (started == null)
+                {
+                    var newStudentProgress = new StudentProgress
+                        {
+                            TutorialId = assigned.TutorialId,
+                            Title = assigned.Tutorial.Title,
+                            LessonCount = 0,
+                            NextLesson = 1,
+                            PercentageDone = 0,
+                            QuizGrade = null
+                        };
+
+                    progresses.Add(newStudentProgress);
+                }
+            }
+
+            studentProgresses.Add(studentName, progresses);
+        };
+
+
+        ShowStudents = true;
+    }
+
+
     public class StudentProgress
     {
         public int TutorialId { get; set; }
@@ -114,6 +200,6 @@ else
         public int? QuizGrade { get; set; }
         public string? Action { get; set; }
     }
-    
-   
+
+
 }

@@ -39,7 +39,7 @@ namespace Contest.Controllers
             }
             else
             {
-                var studentTutorials = await _context.StudentTutorial.Where(c => c.UserId == studentId && c.TutorialId == tutorialId).ToListAsync();
+                var studentTutorials = await _context.StudentTutorial.Where(c => c.UserId == studentId).ToListAsync();
                 return studentTutorials;
             }
         }
